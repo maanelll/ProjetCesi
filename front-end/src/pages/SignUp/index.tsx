@@ -2,15 +2,28 @@ import { useState, FormEvent } from 'react';
 import './signUpStyle.css';
 import { Link } from 'react-router-dom';
 import { Typography } from '@mui/material';
+import validator from 'validator';
 
 function SignUp() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [prenom, setPrenom] = useState('');
+  const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (password !== passwordConfirm) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+
+    if (!validator.isEmail(email)) {
+    setPasswordError('Invalid email format');
+    return;
+  }
+    setPasswordError('');
   };
 
   return (
@@ -23,25 +36,25 @@ function SignUp() {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="firstName">First Name:</label>
+            <label htmlFor="prenom">Prénom:</label>
             <input
               type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
+              id="prenom"
+              value={prenom}
+              onChange={(event) => setPrenom(event.target.value)}
             />
           </div>
           <div className="input-group">
-            <label htmlFor="lastName">Last Name:</label>
+            <label htmlFor="nom">Nom:</label>
             <input
               type="text"
-              id="lastName"
-              value={lastName}
-              onChange={(event) => setLastName(event.target.value)}
+              id="nom"
+              value={nom}
+              onChange={(event) => setNom(event.target.value)}
             />
           </div>
           <div className="input-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Mon adresse e-mail:</label>
             <input
               type="email"
               id="email"
@@ -50,7 +63,7 @@ function SignUp() {
             />
           </div>
           <div className="input-group">
-            <label htmlFor="password">Password:</label>
+            <label htmlFor="password">Mon mot de passe:</label>
             <input
               type="password"
               id="password"
@@ -58,10 +71,20 @@ function SignUp() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
-          <button type="submit" className="signup-btn">Sign Up</button>
+          <div className="input-group">
+            <label htmlFor="passwordConfirm">Confirmer le mot de passe:</label>
+            <input
+              type="password"
+              id="passwordConfirm"
+              value={passwordConfirm}
+              onChange={(event) => setPasswordConfirm(event.target.value)}
+            />
+          </div>
+          {passwordError && <p className="error-message">{passwordError}</p>}
+          <button type="submit" className="signup-btn">CRÉER UN COMPTE</button>
         </form>
         <div className="signup-footer">
-          <p>Already have an account? <Link to="/SignIn">Sign in</Link></p>
+          <p>Tu as déja un compte? <Link to="/SignIn">Connexion</Link></p>
         </div>
       </div>
     </div>

@@ -1,14 +1,17 @@
 import { useRoutes } from "react-router-dom"
 import { Suspense, lazy } from "react"
 
+const Dashboard = lazy(() => import("../pages/Dashboard"))
 const Login = lazy(()=> import("../pages/Login"))
-const SignUp = lazy(()=> import("../pages/SignUp"))
+const SignUp = lazy(() => import("../pages/SignUp"))
+const Entreprises = lazy(() => import("../pages/admin/entreprises"))
+const Etudiants = lazy(()=> import("../pages/admin/etudiants"))
 
 const AppRoutes = () => {
     const element = useRoutes([
         {
-            path :"/",
-        element: <Login/>
+        path: "/",
+        element: <Dashboard />,
         },
         {
             path :"SignIn",
@@ -17,6 +20,14 @@ const AppRoutes = () => {
         {
             path :"SignUp",
         element: <SignUp/>
+        },
+        {
+            path: "/admin/entreprises",
+            element: <Entreprises/>
+        },
+        {
+            path: "/admin/etudiants",
+            element: <Etudiants/>
         }
         
     ])

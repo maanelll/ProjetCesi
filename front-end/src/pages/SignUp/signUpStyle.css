@@ -124,4 +124,12 @@
   .signup-box button[type="submit"] {
     margin-top: 20px;
   }
-  
+  .error-message {
+    color: red;
+    margin-top: 5px;
+  }
+  .input-group label::after {
+  content: '*';
+  color: red;
+  margin-left: 5px;
+}
