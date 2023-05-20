@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { Box, Button, Typography } from "@mui/material"
 
 import { routes } from "../../config/constants"
+import profileImage from "../../assets/img/aymenImg.jpg";
 
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
@@ -18,10 +19,13 @@ const Navbar = () => {
       navigate(link)
     }
   }
+  const handleSignOut = () => {
+    navigate("signIn")
+  };
   return (
     <Box
       sx={{
-        backgroundImage: (theme) => theme.palette.gradient.blue,
+        backgroundImage: (theme) => theme.palette.gradient.purple,
         borderRadius: "0px 0px 60px 0px",
         height: "100%",
         px: "10px",
@@ -35,6 +39,45 @@ const Navbar = () => {
           justifyContent: "center",
         }}
       >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+        <Box
+          sx={{
+            width: "70px",
+            height: "70px",
+            backgroundImage: `url(${profileImage})`,
+            backgroundSize: "cover",
+            borderRadius: "50%",
+            marginBottom: "10px",
+          }}
+        />
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#fff",
+          }}
+        >
+          Aymen KALLEL
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleSignOut}
+            sx={{
+              marginTop: "10px",
+              "&:hover": {
+          boxShadow: "3px 3px #Fafad4",
+          transition: ".2s",
+        },
+            }}
+          >
+            <Typography sx={{color:"black",fontFamily:"arial"}}>deconnexion</Typography>
+          </Button>
+          </Box>
         {/* {isAuthenticated && <SignOutButton />} */}
       </Box>
       <Box>

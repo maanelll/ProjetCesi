@@ -1,8 +1,4 @@
 //Main colors
-const ORANGE = {
-  contrastText: "#ffffff",
-  main: "#FDA42A",
-}
 
 const BLUE = {
   main: "#1C84C6",
@@ -15,6 +11,10 @@ const RED = {
 
 const GREEN = {
   main: "#2ECC71",
+}
+const YELLOW = {
+  contrastText: "#ffffff",
+  main: "#F0f043"
 }
 
 const GREY = {
@@ -41,10 +41,11 @@ const WHITE = "#fff"
 
 const ORANGE_GRADIENT = "linear-gradient(183.6deg, #FDA42A 0%, #F08303 73.17%);"
 const BLUE_GRADIENT = "linear-gradient(183.6deg, #007bff 0%, #0056b3 73.17%);"
+const PURPLE_GRADIENT = "linear-gradient(183.6deg, #8A4DFF 0%, #AFA5D1 73.17%)"
 
 
 const palette = {
-  primary: ORANGE,
+  primary: YELLOW,
   blue: BLUE,
   red: RED,
   green: GREEN,
@@ -76,7 +77,8 @@ const palette = {
   },
   gradient: {
     orange: ORANGE_GRADIENT,
-    blue:BLUE_GRADIENT,
+    blue: BLUE_GRADIENT,
+    purple:PURPLE_GRADIENT,
   },
 }
 

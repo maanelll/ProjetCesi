@@ -5,6 +5,8 @@ const Dashboard = lazy(() => import("../pages/Dashboard"))
 const Login = lazy(()=> import("../pages/Login"))
 const SignUp = lazy(() => import("../pages/SignUp"))
 const Entreprises = lazy(() => import("../pages/admin/entreprises"))
+const CreateEntreprise = lazy(() => import("../pages/admin/entreprises/create"))
+const AddOffreStageForm = lazy(() => import("../pages/admin/entreprises/[id]/addOffreStageForm"))
 const Etudiants = lazy(()=> import("../pages/admin/etudiants"))
 
 const AppRoutes = () => {
@@ -24,6 +26,14 @@ const AppRoutes = () => {
         {
             path: "/admin/entreprises",
             element: <Entreprises/>
+        },
+        {
+            path: "/admin/entreprises/create",
+            element: <CreateEntreprise/>
+        },
+        {
+            path: "/admin/entreprises/:entrepriseId/addOffreStageForm",
+            element: <AddOffreStageForm/>
         },
         {
             path: "/admin/etudiants",
