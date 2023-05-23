@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PromotionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: PromotionRepository::class)]
 class Promotion
@@ -15,7 +16,7 @@ class Promotion
 
     #[ORM\Column(length: 100)]
     private ?string $promo = null;
-    
+
     #[ORM\ManyToMany(targetEntity: OffreStage::class, inversedBy: "Promotion")]
     #[ORM\JoinTable(name: "OffreStage_Promotion")]
     private Collection $offrestages;

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CompetenceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CompetenceRepository::class)]
 class Competence

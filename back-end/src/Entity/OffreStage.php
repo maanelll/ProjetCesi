@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OffreStageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OffreStageRepository::class)]
 class OffreStage
@@ -27,11 +28,11 @@ class OffreStage
     private ?int $nb_places_offert = null;
 
     #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "OffreStage")]
-     private Collection $competences;
-   
+    private Collection $competences;
+
     #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: "OffreStage")]
     private Collection $promotions;
-    
+
     public function getId(): ?int
     {
         return $this->id;
