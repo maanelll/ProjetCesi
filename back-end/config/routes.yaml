@@ -1,7 +1,49 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
 api_login_check:
-    path: /api/login_check
+  path: /api/login_check
+localite_routes:
+  resource: "../src/Controller/LocaliteController.php"
+  type: annotation
+app_get_data:
+  path: /api/entreprise
+  controller: App\Controller\EntrepriseController::getData
+  methods: GET
+
+app_create_data:
+  path: /entreprise
+  controller: App\Controller\EntrepriseController::createData
+  methods: POST
+
+app_update_data:
+  path: /entreprise/{id}
+  controller: App\Controller\EntrepriseController::updateData
+  methods: [PATCH]
+
+app_delete_data:
+  path: /entreprise/{id}
+  controller: App\Controller\EntrepriseController::deleteData
+  methods: [DELETE]
+
+app_get_data_localite:
+  path: /localite
+  controller: App\Controller\LocaliteController::getLocalites
+  methods: GET
+
+app_create_data_localite:
+  path: /localite
+  controller: App\Controller\LocaliteController::createLocalite
+  methods: POST
+
+app_update_data_localite:
+  path: /localite/{id}
+  controller: App\Controller\LocaliteController::updateLocalite
+  methods: [PATCH]
+
+app_delete_data_localite:
+  path: /localite/{id}
+  controller: App\Controller\LocaliteController::deleteLocalite
+  methods: [DELETE]

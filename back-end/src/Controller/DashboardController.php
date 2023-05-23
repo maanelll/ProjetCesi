@@ -6,7 +6,7 @@
   use Symfony\Component\HttpFoundation\Response;
   use Symfony\Component\Routing\Annotation\Route;
   use Symfony\Component\Security\Core\Authorization\Attribute\IsGranted;
-    
+  
   /**
    * @Route("/api", name="api_")
    */
