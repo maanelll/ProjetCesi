@@ -1,14 +1,24 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useContext } from 'react';
 import './loginStyle.css';
 import { Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../config/authContext';
+
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useContext(AuthContext);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+     try {
+    await login(username, password);
+    // Login successful, handle any necessary redirection or state updates
+  } catch (error) {
+    // Login failed, handle the error (e.g., show an error message)
+  }
+
   };
 
   return (

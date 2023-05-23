@@ -10,10 +10,10 @@ function App() {
   return (
     <Router>
       <ThemeProvider theme={theme}>
-      <AppLayout>
-        <AppRoutes/>
+        <AppLayout>
+          <AppRoutes/>
         </AppLayout>
-        </ThemeProvider>
+      </ThemeProvider>
     </Router>
   );
 }

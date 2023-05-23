@@ -1,11 +1,13 @@
+import { useContext } from "react"
 import Navbar from "../../components/Navbar"
+import AuthContext from "../../config/authContext"
 
 type AppLayoutPropsType = {
   children: JSX.Element
 }
 
 const AppLayout = ({ children }: AppLayoutPropsType) => {
-    const isAuthenticated = true;
+  const { isAuthenticated } = useContext(AuthContext);
   return (
     <div style={{ display: "flex", minHeight: "100vh", margin: 0 }}>
       {isAuthenticated && (
@@ -13,7 +15,9 @@ const AppLayout = ({ children }: AppLayoutPropsType) => {
           <Navbar />
         </div>
       )}
-      <div style={{ flexGrow: 1 }}>{children}</div>
+      <div style={{ flexGrow: 1 }}>
+        {children}
+      </div>
     </div>
   )
 }
