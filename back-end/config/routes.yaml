@@ -57,3 +57,33 @@ app_create_offrestage:
   path: /offrestage
   controller: App\Controller\OffreStageContollerController::createOffreStage
   methods: POST
+
+# app_update_data_localite:
+#   path: /localite/{id}
+#   controller: App\Controller\LocaliteController::updateLocalite
+#   methods: [PATCH]
+
+# app_delete_data_localite:
+#   path: /localite/{id}
+#   controller: App\Controller\LocaliteController::deleteLocalite
+# methods: [DELETE]  reseerver pour les offres de stage
+
+app_get_data_competence:
+  path: /localite
+  controller: App\Controller\CompetenceController::getcCmpetence
+  methods: GET
+
+app_create_data_competence:
+  path: /localite
+  controller: App\Controller\CompetenceController::createCompetence
+  methods: POST
+
+app_update_data_competence:
+  path: /localite/{id}
+  controller: App\Controller\CompetenceController::updateCompetencee
+  methods: [PATCH]
+
+app_delete_data_competence:
+  path: /localite/{id}
+  controller: App\Controller\CompetenceController::deleteCompetence
+  methods: [DELETE]
