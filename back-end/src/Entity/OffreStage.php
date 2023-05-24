@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\OffreStageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
@@ -27,12 +28,21 @@ class OffreStage
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $nb_places_offert = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "OffreStage")]
     private Collection $competences;
 
     #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: "OffreStage")]
     private Collection $promotions;
 
+    public function __construct()
+    {
+        $this->competences = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
+    }
+    // halamadride
     public function getId(): ?int
     {
         return $this->id;
@@ -82,6 +92,72 @@ class OffreStage
     public function setNbPlacesOffert(int $nb_places_offert): self
     {
         $this->nb_places_offert = $nb_places_offert;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Competence>
+     */
+    public function getCompetences(): Collection
+    {
+        return $this->competences;
+    }
+
+    public function addCompetence(Competence $competence): self
+    {
+        if (!$this->competences->contains($competence)) {
+            $this->competences->add($competence);
+            // $competence->addOffreStage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompetence(Competence $competence): self
+    {
+        if ($this->competences->removeElement($competence)) {
+            // $competence->removeOffreStage($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Promotion>
+     */
+    public function getPromotions(): Collection
+    {
+        return $this->promotions;
+    }
+
+    public function addPromotion(Promotion $promotion): self
+    {
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions->add($promotion);
+            // $promotion->addOffreStage($this); logiquement ca dans promotion/et competence il faut voir comment 
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): self
+    {
+        if ($this->promotions->removeElement($promotion)) {
+            // $promotion->removeOffreStage($this);
+        }
 
         return $this;
     }

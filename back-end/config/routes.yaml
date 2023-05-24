@@ -47,3 +47,13 @@ app_delete_data_localite:
   path: /localite/{id}
   controller: App\Controller\LocaliteController::deleteLocalite
   methods: [DELETE]
+
+app_getdata_offrestage:
+  path: /offrestage
+  controller: App\Controller\OffreStageContollerController::getOffreStage
+  methods: GET
+
+app_create_offrestage:
+  path: /offrestage
+  controller: App\Controller\OffreStageContollerController::createOffreStage
+  methods: POST
