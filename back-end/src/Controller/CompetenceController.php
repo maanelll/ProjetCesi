@@ -24,7 +24,7 @@ class CompetenceController extends AbstractController
     /**
      * @Route("/competence", name="get_competence", methods={"GET"})
      */
-    public function getLocalites(CompetenceRepository $repository): JsonResponse
+    public function getCompetence(CompetenceRepository $repository): JsonResponse
     { {
             $competence = $repository->findAll();
 
@@ -43,7 +43,7 @@ class CompetenceController extends AbstractController
     /**
      * @Route("/competence", name="create_competence", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function createCompetence(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -58,7 +58,7 @@ class CompetenceController extends AbstractController
     /**
      * @Route("/competence/{id}", name="update_competence", methods={"PATCH"})
      */
-    public function updateLocalite(Request $request, Competence $competence): JsonResponse
+    public function updateCompetence(Request $request, Competence $competence): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -74,7 +74,7 @@ class CompetenceController extends AbstractController
     /**
      * @Route("/competence/{id}", name="delete_competence", methods={"DELETE"})
      */
-    public function deleteLocalite(Competence $competence, EntityManagerInterface $entityManager): JsonResponse
+    public function deleteCompetence(Competence $competence, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($competence);
         $entityManager->flush();
