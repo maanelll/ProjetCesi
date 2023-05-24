@@ -36,6 +36,7 @@ class PromotionController extends AbstractController
                 ];
             }
 
+
             return new JsonResponse($data);
         }
     }
@@ -43,7 +44,7 @@ class PromotionController extends AbstractController
     /**
      * @Route("/promotion", name="create_promotion", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function createPromotion(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -56,9 +57,9 @@ class PromotionController extends AbstractController
     }
 
     /**
-     * @Route("/promotion/{id}", name="update_promotion, methods={"PATCH"})
+     * @Route("/promotion/{id}", name="update_promotion", methods={"PATCH"})
      */
-    public function updateLocalite(Request $request, Promotion $promotion): JsonResponse
+    public function updatePromotion(Request $request, Promotion $promotion): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -74,7 +75,7 @@ class PromotionController extends AbstractController
     /**
      * @Route("/promotion/{id}", name="delete_promotion", methods={"DELETE"})
      */
-    public function deleteLocalite(Promotion $promotion, EntityManagerInterface $entityManager): JsonResponse
+    public function deletePromotion(Promotion $promotion, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($promotion);
         $entityManager->flush();

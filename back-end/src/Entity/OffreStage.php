@@ -120,7 +120,7 @@ class OffreStage
     {
         if (!$this->competences->contains($competence)) {
             $this->competences->add($competence);
-            // $competence->addOffreStage($this);
+            $competence->addOffreStage($this);
         }
 
         return $this;
@@ -129,7 +129,7 @@ class OffreStage
     public function removeCompetence(Competence $competence): self
     {
         if ($this->competences->removeElement($competence)) {
-            // $competence->removeOffreStage($this);
+            $competence->removeOffreStage($this);
         }
 
         return $this;
@@ -147,7 +147,7 @@ class OffreStage
     {
         if (!$this->promotions->contains($promotion)) {
             $this->promotions->add($promotion);
-            // $promotion->addOffreStage($this); logiquement ca dans promotion/et competence il faut voir comment 
+            $promotion->addOffreStage($this);
         }
 
         return $this;
@@ -156,7 +156,7 @@ class OffreStage
     public function removePromotion(Promotion $promotion): self
     {
         if ($this->promotions->removeElement($promotion)) {
-            // $promotion->removeOffreStage($this);
+            $promotion->removeOffreStage($this);
         }
 
         return $this;

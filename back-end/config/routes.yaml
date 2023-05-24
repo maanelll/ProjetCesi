@@ -14,17 +14,17 @@ app_get_data:
   methods: GET
 
 app_create_data:
-  path: /entreprise
+  path: /api/entreprise
   controller: App\Controller\EntrepriseController::createData
   methods: POST
 
 app_update_data:
-  path: /entreprise/{id}
+  path: /api/entreprise/{id}
   controller: App\Controller\EntrepriseController::updateData
   methods: [PATCH]
 
 app_delete_data:
-  path: /entreprise/{id}
+  path: /api/entreprise/{id}
   controller: App\Controller\EntrepriseController::deleteData
   methods: [DELETE]
 
@@ -58,32 +58,52 @@ app_create_offrestage:
   controller: App\Controller\OffreStageContollerController::createOffreStage
   methods: POST
 
-# app_update_data_localite:
-#   path: /localite/{id}
-#   controller: App\Controller\LocaliteController::updateLocalite
-#   methods: [PATCH]
+app_update_data_offrestage:
+  path: /offrestage/{id}
+  controller: App\Controller\OffreStageController::updateOffreStage
+  methods: [PATCH]
 
-# app_delete_data_localite:
-#   path: /localite/{id}
-#   controller: App\Controller\LocaliteController::deleteLocalite
-# methods: [DELETE]  reseerver pour les offres de stage
+app_delete_data_offrestage:
+  path: /offrestage/{id}
+  controller: App\Controller\OffreStageController::deleteOffreStage
+  methods: [DELETE]
 
 app_get_data_competence:
-  path: /localite
-  controller: App\Controller\CompetenceController::getcCmpetence
+  path: /competence
+  controller: App\Controller\CompetenceController::getCompetence
   methods: GET
 
 app_create_data_competence:
-  path: /localite
+  path: /competence
   controller: App\Controller\CompetenceController::createCompetence
   methods: POST
 
 app_update_data_competence:
-  path: /localite/{id}
-  controller: App\Controller\CompetenceController::updateCompetencee
+  path: /competence/{id}
+  controller: App\Controller\CompetenceController::updateCompetence
   methods: [PATCH]
 
 app_delete_data_competence:
-  path: /localite/{id}
+  path: /competence/{id}
   controller: App\Controller\CompetenceController::deleteCompetence
+  methods: [DELETE]
+
+app_get_data_promotion:
+  path: /promotion
+  controller: App\Controller\PromotionController::getPromotion
+  methods: GET
+
+app_create_data_promotion:
+  path: /promotion
+  controller: App\Controller\PromotionController::createPromotion
+  methods: POST
+
+app_update_data_promotion:
+  path: /promotion/{id}
+  controller: App\Controller\PromotionController::updatePromotion
+  methods: [PATCH]
+
+app_delete_data_promotion:
+  path: /promotion/{id}
+  controller: App\Controller\PromotionController::deletePromotion
   methods: [DELETE]

@@ -37,4 +37,22 @@ class Promotion
 
         return $this;
     }
+    public function addOffreStage(OffreStage $offrestage): self
+    {
+        if (!$this->offrestages->contains($offrestage)) {
+            $this->offrestages[] = $offrestage;
+            $offrestage->addPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffreStage(OffreStage $offrestage): self
+    {
+        if ($this->offrestages->removeElement($offrestage)) {
+            $offrestage->removePromotion($this);
+        }
+
+        return $this;
+    }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Competence;
 use App\Entity\OffreStage;
+use App\Entity\Promotion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,5 +62,49 @@ class OffreStageContollerController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
+    }
+    /**
+     * @Route("/offrestage/{id}", name="app_update_data", methods={"PATCH"})
+     */
+    public function updateData(Request $request, OffreStage $offrestage): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $offrestage->setName($data['name']);
+        $offrestage->setDureeStag($data['duree_stag']);
+        $offrestage->setBaseRenum($data['base_renum']);
+        $offrestage->setDateOffre(DateTimeImmutable::createFromFormat('Y-m-d', $data['date_offre']));
+        $offrestage->setNbPlacesOffert($data['nb_places_offert']);
+
+        $competenceIds = $data['competence'];
+        $promortionIds = $data['promotion'];
+
+        foreach ($competenceIds as $competenceId) {
+            $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
+            if ($competence) {
+                $offrestage->addCompetence($competence);
+            }
+        }
+        foreach ($promortionIds as $promortionId) {
+
+            $promotion = $this->entityManager->getRepository(Promotion::class)->find($promortionId);
+            if ($promotion) {
+                $offrestage->addPromotion($promotion);
+            }
+        }
+        $this->entityManager->persist($offrestage);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
+    }
+    /**
+     * @Route("/offrestage/{id}", name="app_delete_data", methods={"DELETE"})
+     */
+    public function deleteData(OffreStage $offrestage, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($offrestage);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Data deleted successfully'], JsonResponse::HTTP_OK);
     }
 }
