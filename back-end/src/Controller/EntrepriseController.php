@@ -64,6 +64,23 @@ class EntrepriseController extends AbstractController
         $entreprise->setSecteurAct($data['secteur_act']);
 
         $entreprise->setNbStagCesi($data['nb_stage_cesi']);
+        $localiteIds = $data['localite'] ?? [];
+        $localites = [];
+
+        foreach ($localiteIds as $localiteId) {
+            $localite = $this->entityManager->getRepository(Localite::class)->find($localiteId);
+
+            if ($localite) {
+                $localites[] = $localite;
+            }
+        }
+
+        $entreprise->getLocalites()->clear();
+        foreach ($localites as $localite) {
+            $entreprise->addLocalite($localite);
+        }
+
+
 
         $this->entityManager->persist($entreprise);
         $this->entityManager->flush();
@@ -86,20 +103,21 @@ class EntrepriseController extends AbstractController
         if (isset($data["nb_stage_cesi"])) {
             $entreprise->setNbStagCesi($data['nb_stage_cesi']);
         }
-        $localiteIds = $data['localite'] ?? [];
-        $localites = [];
+        if (isset($data['localite'])) {
+            $localiteIds = $data['localite'];
+            $localites = [];
 
-        foreach ($localiteIds as $localiteId) {
-            $localite = $this->entityManager->getRepository(Localite::class)->find($localiteId);
+            foreach ($localiteIds as $localiteId) {
+                $localite = $this->entityManager->getRepository(Localite::class)->find($localiteId);
 
-            if ($localite) {
-                $localites[] = $localite;
+                if ($localite) {
+                    $localites[] = $localite;
+                }
             }
-        }
 
-        $entreprise->getLocalites()->clear();
-        foreach ($localites as $localite) {
-            $entreprise->addLocalite($localite);
+            foreach ($localites as $localite) {
+                $entreprise->addLocalite($localite);
+            }
         }
 
 
