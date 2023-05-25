@@ -10,6 +10,8 @@ use App\Entity\Localite;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\EntrepriseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 /**
  * @Route("/api", name="api_")
@@ -121,21 +123,20 @@ class EntrepriseController extends AbstractController
         if (isset($data["nb_stage_cesi"])) {
             $entreprise->setNbStagCesi($data['nb_stage_cesi']);
         }
+
         if (isset($data['localite'])) {
             $localiteIds = $data['localite'];
-            $localites = [];
+            $list_localites = new ArrayCollection();
 
             foreach ($localiteIds as $localiteId) {
                 $localite = $this->entityManager->getRepository(Localite::class)->find($localiteId);
 
                 if ($localite) {
-                    $localites[] = $localite;
+                    $list_localites->add($localite); // Add new localites
                 }
             }
 
-            foreach ($localites as $localite) {
-                $entreprise->addLocalite($localite);
-            }
+            $entreprise->setLocalites($list_localites);
         }
 
 
@@ -144,7 +145,6 @@ class EntrepriseController extends AbstractController
 
         return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
     }
-
 
     /**
      * @Route("/entreprise/{id}", name="app_delete_data", methods={"DELETE"})

@@ -26,12 +26,12 @@ class Entreprise
     private ?string $Secteur_Act = null;
 
     #[ORM\ManyToMany(targetEntity: Localite::class, mappedBy: "entreprises")]
-    private Collection $localites;
+    private Collection $list_localites;
 
 
     public function __construct()
     {
-        $this->localites = new ArrayCollection();
+        $this->list_localites = new ArrayCollection();
     }
 
 
@@ -71,8 +71,8 @@ class Entreprise
 
     public function addLocalite(Localite $localite): self
     {
-        if (!$this->localites->contains($localite)) {
-            $this->localites[] = $localite;
+        if (!$this->list_localites->contains($localite)) {
+            $this->list_localites[] = $localite;
             $localite->addEntreprise($this);
         }
 
@@ -81,15 +81,16 @@ class Entreprise
 
     public function removeLocalite(Localite $localite): self
     {
-        if ($this->localites->removeElement($localite)) {
-            $localite->removeEntreprise($this);
+        if ($this->list_localites->removeElement($localite)) {
+            $localite->getEntreprises()->removeElement($this);
         }
 
         return $this;
     }
+
     public function getLocalites(): Collection
     {
-        return $this->localites;
+        return $this->list_localites;
     }
     public function getNbStagCesi(): ?int
     {
@@ -100,6 +101,11 @@ class Entreprise
     {
         $this->nb_stag_Cesi = $nb_stag_Cesi;
 
+        return $this;
+    }
+    public function setLocalites(Collection $localites): self
+    {
+        $this->list_localites = $localites;
         return $this;
     }
 }

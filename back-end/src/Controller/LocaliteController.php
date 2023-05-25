@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Localite;
-use App\Repository\LocaliteRpository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\LocaliteRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,8 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 
 /**
-   * @Route("/api", name="api_")
-   */
+ * @Route("/api", name="api_")
+ */
 class LocaliteController extends AbstractController
 {
     private $entityManager;
@@ -28,10 +27,9 @@ class LocaliteController extends AbstractController
      * @Route("/localite", name="get_localites", methods={"GET"})
      */
     public function getLocalites(LocaliteRepository $repository): JsonResponse
-    {
-        {
+    { {
             $localites = $repository->findAll();
-        
+
             $data = [];
             foreach ($localites as $localite) {
                 $data[] = [
@@ -39,7 +37,7 @@ class LocaliteController extends AbstractController
                     'name' => $localite->getName(),
                 ];
             }
-        
+
             return new JsonResponse($data);
         }
     }
@@ -47,7 +45,7 @@ class LocaliteController extends AbstractController
     /**
      * @Route("/localite", name="create_localite", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager ): JsonResponse
+    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -57,6 +55,8 @@ class LocaliteController extends AbstractController
         $entityManager->persist($localite);
         $entityManager->flush();
         return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
+        // return new JsonResponse(['id' => $localite->getId()], 201);
+
     }
 
     /**
@@ -68,18 +68,17 @@ class LocaliteController extends AbstractController
 
         $localite->setName($data['name']);
 
-        
-            $this->entityManager->persist($localite);
-            $this->entityManager->flush();
-    
-            return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
-        
+
+        $this->entityManager->persist($localite);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
     }
 
     /**
      * @Route("/localite/{id}", name="delete_localite", methods={"DELETE"})
      */
-    public function deleteLocalite(Localite $localite,EntityManagerInterface $entityManager): JsonResponse
+    public function deleteLocalite(Localite $localite, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($localite);
         $entityManager->flush();
