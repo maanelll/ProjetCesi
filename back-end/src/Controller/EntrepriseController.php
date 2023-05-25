@@ -18,39 +18,57 @@ class EntrepriseController extends AbstractController
 {
     private $entityManager;
 
-
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
-    /**
-     * @Route("/entreprise", name="entreprise", methods={"GET"} )
-     */
-    public function getData(EntrepriseRepository $repository): JsonResponse
-    {
-        $data = $repository->findAll();
 
-        $formattedData = [];
-        foreach ($data as $item) {
-            $localites = [];
-            foreach ($item->getLocalites() as $localite) {
-                $localites[] = [
-                    'id' => $localite->getId(),
-                    'name' => $localite->getName(),
-                ];
+    /**
+     * @Route("/entreprise/{id}", name="entreprise", methods={"GET"})
+     */
+    public function getData(EntrepriseRepository $repository, $id = null): JsonResponse
+    {
+        if ($id) {
+            $entreprise = $repository->find($id);
+
+            if (!$entreprise) {
+                return new JsonResponse(['message' => 'Enterprise not found'], JsonResponse::HTTP_NOT_FOUND);
             }
 
-            $formattedData[] = [
-                'id' => $item->getId(),
-                'nom' => $item->getNom(),
-                'secteur_act' => $item->getSecteurAct(),
-                'localites' => $localites,
-                'nb_stage_cesi' => $item->getNbStagCesi(),
-            ];
+            $formattedData = $this->formatEnterpriseData($entreprise);
+            return new JsonResponse($formattedData);
+        }
+
+        $enterprises = $repository->findAll();
+        $formattedData = [];
+
+        foreach ($enterprises as $entreprise) {
+            $formattedData[] = $this->formatEnterpriseData($entreprise);
         }
 
         return new JsonResponse($formattedData);
     }
+
+    private function formatEnterpriseData(Entreprise $entreprise): array
+    {
+        $localites = [];
+
+        foreach ($entreprise->getLocalites() as $localite) {
+            $localites[] = [
+                'id' => $localite->getId(),
+                'name' => $localite->getName(),
+            ];
+        }
+
+        return [
+            'id' => $entreprise->getId(),
+            'nom' => $entreprise->getNom(),
+            'secteur_act' => $entreprise->getSecteurAct(),
+            'localites' => $localites,
+            'nb_stage_cesi' => $entreprise->getNbStagCesi(),
+        ];
+    }
+
 
     /**
      * @Route("/entreprise", name="app_create_data", methods={"POST"})
