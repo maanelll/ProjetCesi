@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\EntrepriseRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -50,12 +49,12 @@ class Entreprise
         return $this->Nom;
     }
 
- 
+
     public function setNom(string $Nom): self
     {
-    $this->Nom = $Nom;
+        $this->Nom = $Nom;
 
-    return $this;
+        return $this;
     }
 
     public function getSecteurAct(): ?string
@@ -103,6 +102,4 @@ class Entreprise
 
         return $this;
     }
- 
-   
 }
