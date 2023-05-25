@@ -25,7 +25,7 @@ const EntrepriseAdmin = () => {
             </Box>
             <Box sx={{ display: "flex", marginTop: "-80px", marginLeft:"50px"}}>
               <Button type="submit" variant="contained" color="primary" onClick={handleClickAddEntreprise}>
-                <Typography sx={{color:"black",fontFamily:"arial"}} >Créer</Typography>
+                <Typography sx={{color:"black",fontFamily:"arial"}} >Ajouter</Typography>
               </Button>
             </Box>
           </>

@@ -6,13 +6,12 @@ import { Box, Button, Typography } from "@mui/material"
 import { routes } from "../../config/constants"
 import profileImage from "../../assets/img/aymenImg.jpg";
 import AuthContext from "../../config/authContext";
-import LogoutButton from "../logoutButton";
 
 
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   const handleClick = (link: string) => {
       setOpenedLink(link === openedLink ? "" : link)
@@ -25,6 +24,7 @@ const Navbar = () => {
   }
   const handleSignOut = () => {
     logout();
+    navigate('/SignIn')
   };
   return (
     <Box

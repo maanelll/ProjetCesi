@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
           Dashboard
         </Typography>
       ) : (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box >
           <Login />
         </Box>
       )}

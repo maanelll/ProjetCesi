@@ -7,7 +7,7 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = async (username: string, password: string): Promise<void> => {
     try {
@@ -36,7 +36,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('token');
 
     // Set isAuthenticated to false
-    setIsAuthenticated(false);
+      setIsAuthenticated(false);
+    //redirect to login page
   };
 
   return (
