@@ -15,7 +15,7 @@ const AppRoutes = () => {
         element: <Dashboard />,
         },
         {
-            path :"/SignIn",
+            path :"signIn",
         element: <Login/>
         },
         {

@@ -1,13 +1,15 @@
 import { Box, Button, Rating, TextField, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../../types";
+import AuthContext from "../../../../config/authContext";
 
 
 
 const CreateEntreprise = () => {
   const navigate = useNavigate()
+  const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise>({
     id:0,
     nom: "",
@@ -16,7 +18,9 @@ const CreateEntreprise = () => {
     localites: [],
   });
   const [localiteInput, setLocaliteInput] = useState("");
-    const handleChangeEntreprise = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleChangeEntreprise = (e: React.ChangeEvent<HTMLInputElement>) => {
+      
     const { name, value } = e.target;
     setEntreprise((prevData) => ({ ...prevData, [name]: value }));
     };
@@ -39,6 +43,12 @@ const CreateEntreprise = () => {
       setLocaliteInput("");
     }
   };
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}` 
+    }
+  };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,40 +58,40 @@ const CreateEntreprise = () => {
     nb_stage_cesi: entreprise.nb_stage_cesi,
     localites:[]
     };
-    const config = {
-    headers: {
-      Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2ODQ5MzQwNTEsImV4cCI6MTY4NDkzNzY1MSwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJlbWFpbCI6InNhaWZAZXhhbXBsZS5jb20ifQ.plvWbSDk22AZRm6rBipnXwJ3sP0Ak6Mx9fqEkDnjzFTosviH0RckIqudxlx_Jj-l_3fhV3hNU2Vr9Rf_wcLLUDX94GEJBRC6aIUwvUTrfNfRpfeB8juKl4ShnAdzKElJtZiHpz9VQRCnFe_9rvi92_BCVTXcz0OSUM4m_jCBVaqFb5ra2T7Vj1KxHA1A-Zohh_RQFqU2iPfROTilAVSX58VciyLydNnf_LlGjPzCm5_63G5tZ6ua7Sl71Elrm2T6IplQYgsVzdySXN2-CWKNJtkV16dlx0NgwroYkenMUatMpiWNyDJHrklSZtJlKiSFlIArEnBzApNDlA_1G14IDaHzvA0-CjS3m4tLE_zXvGb8LY6ejoXtY3TRLnvcEVQHmjhT5d000RiIqsydyFxuD2hTiuuGs22K7ifBuX4sKeD1z-J6DKw-pdifnEBc40vUngehBUNB0EoSPvqbjVfRYps687BC_vmFgZAD1aRM8Wj6Uszhx5fj32GLPGDRTHGSDRzm85VyFf-YUiRk5BvNpdvxRhkX7vjDHich9o73yihBDo1AJkotuEJEHRd4YgZtl6PYfHfjNB_onhVTKIc9N5vYqbvBTPBByntSAKqeY-mcnc-onNVipJrPOGeHP6-1eU68CmolQzYAu5Ry7n2JXs9KHfVr2UNfL-CJu12Qznw` 
+    const localite = {
+      name:localiteInput
     }
-  };
-    const localiteRequests = entreprise.localites.map((localite) => {
-        return axios.post(`http://localhost:8000/api/localite`, localite, config);
-      });
     
-    Promise.all(localiteRequests)
-    .then((localiteResponses) => {
-      // const localiteIds = localiteResponses.map((response) => response.data.id);
-      // const entrepriseData = {
-      //     ...entreprise,
-      //     localites: localiteIds,
-      //   };
-        return axios.post(`http://localhost:8000/api/entreprise`, requestBody, config);
-    })
-    .then((entrepriseResponse)=>{
-      const entrepriseId = entrepriseResponse.data.id;
-      const patchRequest = axios.patch(
-        `http://localhost:8000/api/entreprise/${entrepriseId}`,
-        {
-          id: entreprise.localites.map((localite) => localite.id),
-        }
-      );
-      return patchRequest;
-    })
-    .then(()=>{
-      navigate("/admin/entreprises");
-    })
-    .catch(error => {
-      console.error(error);
-    });
+    // const localiteRequests = entreprise.localites.map((localite) => {
+    //     return axios.post(`http://localhost:8000/api/localite`, localite, config);
+    //   });
+    const requestLocalite = axios.post(`http://localhost:8000/api/localite`, localite, config);
+    console.log(requestLocalite)
+    // Promise.all(localiteRequests)
+    // .then((localiteResponses) => {
+    //   const localiteIds = localiteResponses.map((response) => response.data.id);
+    //   const entrepriseData = {
+    //       ...entreprise,
+    //       localites: localiteIds,
+    //     };
+    //     return axios.post(`http://localhost:8000/api/entreprise`, entrepriseData, config);
+    // })
+    // .then((entrepriseResponse)=>{
+    //   const entrepriseId = entrepriseResponse.data.id;
+    //   const patchRequest = axios.patch(
+    //     `http://localhost:8000/api/entreprise/${entrepriseId}`,
+    //     {
+    //       id: entreprise.localites.map((localite) => localite.id),
+    //     }
+    //   );
+    //   return patchRequest;
+    // })
+    // .then(()=>{
+    //   navigate("/admin/entreprises");
+    // })
+    // .catch(error => {
+    //   console.error(error);
+    // });
   };
     return (
         <Box sx={{ p: 3 }}>

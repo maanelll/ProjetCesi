@@ -24,7 +24,6 @@ const Navbar = () => {
   }
   const handleSignOut = () => {
     logout();
-    navigate('/SignIn')
   };
   return (
     <Box

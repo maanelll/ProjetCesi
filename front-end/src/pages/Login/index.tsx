@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useContext } from 'react';
+import { useState, FormEvent, useContext, useEffect } from 'react';
 import './loginStyle.css';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import AuthContext from '../../config/authContext';
@@ -12,7 +12,14 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate()
-  const { login } = useContext(AuthContext);
+  const {isAuthenticated,errorMessage, login } = useContext(AuthContext);
+
+  useEffect(() => {
+    // Check if the user is already authenticated
+    if (isAuthenticated) {
+      navigate('/'); // Redirect to the home page
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleTogglePassword = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -23,9 +30,7 @@ function Login() {
     try {
        setIsLoading(true);
       await login(username, password);
-      navigate("/")
   } catch (error) {
-    // Login failed, handle the error (e.g., show an error message)
     } finally {
       setIsLoading(false);
   }
@@ -66,6 +71,7 @@ function Login() {
               </span>
             </div>
           </div>
+          {errorMessage && <p>{errorMessage}</p>}
            <button type="submit" className="login-btn" disabled={isLoading}>
             {isLoading ? <CircularProgress size={24} /> : 'Se connecter'}
           </button>
