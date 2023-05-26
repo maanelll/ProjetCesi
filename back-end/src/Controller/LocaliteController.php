@@ -24,23 +24,39 @@ class LocaliteController extends AbstractController
         $this->entityManager = $entityManager;
     }
     /**
-     * @Route("/localite", name="get_localites", methods={"GET"})
+     * @Route("/localite/{id}", name="get_localites", methods={"GET"})
      */
-    public function getLocalites(LocaliteRepository $repository): JsonResponse
-    { {
-            $localites = $repository->findAll();
+    public function getLocalites(LocaliteRepository $repository, $id = null): JsonResponse
+    {
+        if ($id) {
+            $localite = $repository->find($id);
 
-            $data = [];
-            foreach ($localites as $localite) {
-                $data[] = [
-                    'id' => $localite->getId(),
-                    'name' => $localite->getName(),
-                ];
+            if (!$localite) {
+                return new JsonResponse(['message' => 'Localite not found'], JsonResponse::HTTP_NOT_FOUND);
             }
+
+            $data = [
+                'id' => $localite->getId(),
+                'name' => $localite->getName(),
+            ];
 
             return new JsonResponse($data);
         }
+
+        $localites = $repository->findAll();
+
+        $data = [];
+        foreach ($localites as $localite) {
+            $data[] = [
+                'id' => $localite->getId(),
+                'name' => $localite->getName(),
+            ];
+        }
+
+        return new JsonResponse($data);
     }
+
+
 
     /**
      * @Route("/localite", name="create_localite", methods={"POST"})
