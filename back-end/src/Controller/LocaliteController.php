@@ -61,7 +61,7 @@ class LocaliteController extends AbstractController
     /**
      * @Route("/localite", name="create_localite", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function createLocalite(Request $request, EntityManagerInterface $entityManager, LocaliteRepository $localiteRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -70,9 +70,11 @@ class LocaliteController extends AbstractController
 
         $entityManager->persist($localite);
         $entityManager->flush();
-        return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
-        // return new JsonResponse(['id' => $localite->getId()], 201);
+        $localityId = $localite->getId(); // Get the ID of the created locality
 
+
+
+        return new JsonResponse(['localities' => [$localityId]], JsonResponse::HTTP_CREATED);
     }
 
     /**
