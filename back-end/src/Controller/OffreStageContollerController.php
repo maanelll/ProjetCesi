@@ -77,7 +77,7 @@ class OffreStageContollerController extends AbstractController
         $offrestage->setNbPlacesOffert($data['nb_places_offert']);
 
         $competenceIds = $data['competence'];
-        $promortionIds = $data['promotion'];
+        // $promortionIds = $data['promotion'];
 
         foreach ($competenceIds as $competenceId) {
             $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
@@ -85,13 +85,7 @@ class OffreStageContollerController extends AbstractController
                 $offrestage->addCompetence($competence);
             }
         }
-        foreach ($promortionIds as $promortionId) {
 
-            $promotion = $this->entityManager->getRepository(Promotion::class)->find($promortionId);
-            if ($promotion) {
-                $offrestage->addPromotion($promotion);
-            }
-        }
         $this->entityManager->persist($offrestage);
         $this->entityManager->flush();
 
