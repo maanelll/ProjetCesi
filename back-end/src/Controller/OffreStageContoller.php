@@ -4,14 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Competence;
 use App\Entity\OffreStage;
-use App\Entity\Promotion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OffreStageRepository;
-use Doctrine\ORM\Mapping\Entity;
 use DateTimeImmutable;
 
 
@@ -77,7 +75,7 @@ class OffreStageContollerController extends AbstractController
         $offrestage->setNbPlacesOffert($data['nb_places_offert']);
 
         $competenceIds = $data['competence'];
-        $promortionIds = $data['promotion'];
+        // $promortionIds = $data['promotion'];
 
         foreach ($competenceIds as $competenceId) {
             $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
@@ -85,13 +83,7 @@ class OffreStageContollerController extends AbstractController
                 $offrestage->addCompetence($competence);
             }
         }
-        foreach ($promortionIds as $promortionId) {
 
-            $promotion = $this->entityManager->getRepository(Promotion::class)->find($promortionId);
-            if ($promotion) {
-                $offrestage->addPromotion($promotion);
-            }
-        }
         $this->entityManager->persist($offrestage);
         $this->entityManager->flush();
 

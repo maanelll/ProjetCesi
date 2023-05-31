@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Localite;
-use App\Repository\LocaliteRpository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\LocaliteRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,8 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 
 /**
-   * @Route("/api", name="api_")
-   */
+ * @Route("/api", name="api_")
+ */
 class LocaliteController extends AbstractController
 {
     private $entityManager;
@@ -25,38 +24,57 @@ class LocaliteController extends AbstractController
         $this->entityManager = $entityManager;
     }
     /**
-     * @Route("/localite", name="get_localites", methods={"GET"})
+     * @Route("/localite/{id}", name="get_localites", methods={"GET"})
      */
-    public function getLocalites(LocaliteRepository $repository): JsonResponse
+    public function getLocalites(LocaliteRepository $repository, $id = null): JsonResponse
     {
-        {
-            $localites = $repository->findAll();
-        
-            $data = [];
-            foreach ($localites as $localite) {
-                $data[] = [
-                    'id' => $localite->getId(),
-                    'name' => $localite->getName(),
-                ];
+        if ($id) {
+            $localite = $repository->find($id);
+
+            if (!$localite) {
+                return new JsonResponse(['message' => 'Localite not found'], JsonResponse::HTTP_NOT_FOUND);
             }
-        
+
+            $data = [
+                'id' => $localite->getId(),
+                'nom' => $localite->getName(),
+            ];
+
             return new JsonResponse($data);
         }
+
+        $localites = $repository->findAll();
+
+        $data = [];
+        foreach ($localites as $localite) {
+            $data[] = [
+                'id' => $localite->getId(),
+                'nom' => $localite->getName(),
+            ];
+        }
+
+        return new JsonResponse($data);
     }
+
+
 
     /**
      * @Route("/localite", name="create_localite", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager ): JsonResponse
+    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $localite = new Localite();
-        $localite->setName($data['name']);
+        $localite = new Localite($entityManager);
+        $localite->setName($data['nom']);
 
         $entityManager->persist($localite);
         $entityManager->flush();
-        return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
+        $localityId = $localite->getId(); // Get the ID of the created locality
+
+
+
+        return new JsonResponse(['localities' => $localityId], JsonResponse::HTTP_CREATED);
     }
 
     /**
@@ -66,20 +84,19 @@ class LocaliteController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $localite->setName($data['name']);
+        $localite->setName($data['nom']);
 
-        
-            $this->entityManager->persist($localite);
-            $this->entityManager->flush();
-    
-            return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
-        
+
+        $this->entityManager->persist($localite);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
     }
 
     /**
      * @Route("/localite/{id}", name="delete_localite", methods={"DELETE"})
      */
-    public function deleteLocalite(Localite $localite,EntityManagerInterface $entityManager): JsonResponse
+    public function deleteLocalite(Localite $localite, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($localite);
         $entityManager->flush();

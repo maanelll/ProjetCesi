@@ -31,18 +31,19 @@ class OffreStage
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "OffreStage")]
+    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "offreStages")]
     private Collection $competences;
 
-    #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: "OffreStage")]
-    private Collection $promotions;
+    #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: 'offreStages')]
+    private ?Promotion $promotion = null;
 
     public function __construct()
     {
         $this->competences = new ArrayCollection();
-        $this->promotions = new ArrayCollection();
     }
-    // halamadride
+
+    // Getters and setters
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,7 +78,7 @@ class OffreStage
         return $this->date_offre;
     }
 
-    public function setDateOffre(\DateTimeInterface $date_offre): self
+    public function setDateOffre(?\DateTimeInterface $date_offre): self
     {
         $this->date_offre = $date_offre;
 
@@ -89,7 +90,7 @@ class OffreStage
         return $this->nb_places_offert;
     }
 
-    public function setNbPlacesOffert(int $nb_places_offert): self
+    public function setNbPlacesOffert(?int $nb_places_offert): self
     {
         $this->nb_places_offert = $nb_places_offert;
 
@@ -101,7 +102,7 @@ class OffreStage
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -126,6 +127,7 @@ class OffreStage
         return $this;
     }
 
+
     public function removeCompetence(Competence $competence): self
     {
         if ($this->competences->removeElement($competence)) {
@@ -134,31 +136,42 @@ class OffreStage
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, Promotion>
-     */
-    public function getPromotions(): Collection
+    public function getPromotion(): ?Promotion
     {
-        return $this->promotions;
+        return $this->promotion;
     }
 
-    public function addPromotion(Promotion $promotion): self
+    public function setPromotion(?Promotion $promotion): self
     {
-        if (!$this->promotions->contains($promotion)) {
-            $this->promotions->add($promotion);
-            $promotion->addOffreStage($this);
-        }
+        $this->promotion = $promotion;
 
         return $this;
     }
 
-    public function removePromotion(Promotion $promotion): self
-    {
-        if ($this->promotions->removeElement($promotion)) {
-            $promotion->removeOffreStage($this);
-        }
+    // /**
+    //  * @return Collection<int, Promotion>
+    //  */
+    // public function getPromotions(): Collection
+    // {
+    //     return $this->promotions;
+    // }
 
-        return $this;
-    }
+    // public function addPromotion(Promotion $promotion): self
+    // {
+    //     if (!$this->promotions->contains($promotion)) {
+    //         $this->promotions->add($promotion);
+    //         $promotion->addOffreStage($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removePromotion(Promotion $promotion): self
+    // {
+    //     if ($this->promotions->removeElement($promotion)) {
+    //         $promotion->removeOffreStage($this);
+    //     }
+
+    //     return $this;
+    // }
 }
