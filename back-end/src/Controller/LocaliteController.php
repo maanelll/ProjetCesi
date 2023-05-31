@@ -74,7 +74,7 @@ class LocaliteController extends AbstractController
 
 
 
-        return new JsonResponse(['localities' => [$localityId]], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(['localities' => $localityId], JsonResponse::HTTP_CREATED);
     }
 
     /**
