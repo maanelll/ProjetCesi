@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import Navbar from "../../components/Navbar"
-import AuthContext from "../../config/authContext"
+import AuthContext from "../../config/AuthContext"
 
 type AppLayoutPropsType = {
   children: JSX.Element

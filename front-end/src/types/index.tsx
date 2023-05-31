@@ -3,7 +3,7 @@ export interface IEntreprise {
     nom: string
     secteur_act: string
     nb_stage_cesi:number
-    localites: ILocalite[]
+    localite: ILocalite[]
 }
 
 export interface ILocalite {

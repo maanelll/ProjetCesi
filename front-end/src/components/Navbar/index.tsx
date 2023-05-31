@@ -5,7 +5,7 @@ import { Box, Button, Typography } from "@mui/material"
 
 import { routes } from "../../config/constants"
 import profileImage from "../../assets/img/aymenImg.jpg";
-import AuthContext from "../../config/authContext";
+import AuthContext from "../../config/AuthContext";
 
 
 const Navbar = () => {

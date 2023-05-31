@@ -1,22 +1,54 @@
+import { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import { Box, Button, Rating, Typography } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef} from '@mui/x-data-grid';
 import { useNavigate } from "react-router-dom";
+import { IEntreprise, ILocalite } from "../../../types";
+import AuthContext from "../../../config/AuthContext";
 
 
 const EntreprisesList: React.FC = () => {
-  const navigate = useNavigate()
-  type GridData = {
-  id: number;
-  nom: string;
-  secteur_act: string;
-  nb_stage_cesi: number;
-  eval_stag:number;
-  conf_pilote: number;
-  
+  const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+  const [entreprise, setEntreprise] = useState<IEntreprise[]>([]);
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}` 
+    }
+  };
+  const handleDeleteEntrepriseClick = (entrepriseId: number) => {
+    axios.delete(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
+      .then(()=>
+        window.location.reload()
+      )
+      .catch((error) => {
+      console.error("Error deleting", error)
+    })
+  };
+  const handleEditEntrepriseClick = (entrepriseId: number) => {
+    navigate(`/admin/entreprises/${entrepriseId}/edit`)
+  };
+  useEffect(() => {
+  axios.get(`http://localhost:8000/api/entreprise`,config)
+    .then(response => {
+      setEntreprise(response.data);
+    })
+    .catch(error => {
+      console.error("Error fetching data:", error);
+    });
+  }, []);
+  const formatLocalites = (localite: ILocalite[]) => {
+    return localite.map((localite) => localite.name).join(", ");
   };
 
 const columns: GridColDef[] = [
-  { field: "nom", headerName: "Nom", width: 150 },
+  { field: "nom", headerName: "Nom", width: 100 },
+  {
+      field: "localite",
+      headerName: "Localités",
+      width: 200,
+      renderCell: (params) => <Typography>{formatLocalites(params.row.localites)}</Typography>,
+    },
   { field: "secteur_act", headerName: "Secteur d'activité", width: 200 },
   { field: "nb_stage_cesi", headerName: "Nombre de Stagiaire", width: 150 },
   {
@@ -38,35 +70,36 @@ const columns: GridColDef[] = [
   {
     field: "actions",
     headerName: "Actions",
-    width: 150,
+    width: 300,
     renderCell: (params: GridCellParams) => {
       const handleButtonClick = (entrepriseId:number) => {
         navigate(`/admin/entreprises/${entrepriseId}/addOffreStageForm`)
       };
 
       return (
+        <>
         <Button variant="contained" onClick={()=>handleButtonClick(params.row.id)}>
           stage
         </Button>
+          <Button variant="contained" onClick={() => handleDeleteEntrepriseClick(params.row.id)}>
+          delete
+        </Button>
+        <Button variant="contained" onClick={() => handleEditEntrepriseClick(params.row.id)}>
+          edit
+        </Button>
+        </>
       );
     },
   },
 ];
-
-const rows: GridData[] = [
-    {id:1,  nom: "Attineos", secteur_act: "developpement", nb_stage_cesi: 5, eval_stag:4, conf_pilote:2 },
-  ];
-
     return (
         <>
       <Box sx={{ p: 3 , marginLeft: "20px" }}>
         <Typography variant="h5" sx={{ mb: 3 }}>
           Liste des entreprises
         </Typography>
-
-        {/* Data Grid */}
         <div style={{ height: 300, width: "100%" }}>
-          <DataGrid<GridData> rows={rows} columns={columns} autoPageSize getRowId={(row) => row.id}/>
+          <DataGrid<IEntreprise> rows={entreprise} columns={columns} autoPageSize getRowId={(row) => row.id} />
         </div>
       </Box>          
         </>
