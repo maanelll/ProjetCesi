@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,7 +30,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $username = null;
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: "students")]
+    #[ORM\JoinColumn(name: "promotion_id", referencedColumnName: "id", nullable: true)]
+    private ?Promotion $promotion = null;
+
+    #[ORM\ManyToOne(targetEntity: Centre::class, inversedBy: "students")]
+    #[ORM\JoinColumn(name: "centre_id", referencedColumnName: "id", nullable: true)]
+    private ?Centre $centre = null;
+
+    #[ORM\OneToMany(targetEntity: Promotion::class, mappedBy: "pilote")]
+    private Collection $managedPromotions;
+
+    public function __construct()
+    {
+        $this->managedPromotions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -62,11 +83,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        // $roles = $this->roles;
-        // // guarantee every user at least has ROLE_USER
-        // $roles[] = 'ROLE_USER';
-
-        // return array_unique($roles);
+        
        return $this->roles;
      }
 
@@ -101,14 +118,78 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getUsername(): ?string
+    public function getNom(): ?string
     {
-        return $this->username;
+        return $this->nom;
     }
 
-    public function setUsername(string $username): self
+    public function setNom(string $nom): self
     {
-        $this->username = $username;
+        $this->nom = $nom;
+
+        return $this;
+    }
+     public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): self
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): self
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+        public function getCentre(): ?Centre
+    {
+        return $this->centre;
+    }
+
+    public function setCentre(?Centre $centre): self
+    {
+        $this->centre = $centre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Promotion>
+     */
+    public function getManagedPromotions(): Collection
+    {
+        return $this->managedPromotions;
+    }
+
+    public function addManagedPromotion(Promotion $managedPromotion): self
+    {
+        if (!$this->managedPromotions->contains($managedPromotion)) {
+            $this->managedPromotions->add($managedPromotion);
+            $managedPromotion->setPilote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManagedPromotion(Promotion $managedPromotion): self
+    {
+        if ($this->managedPromotions->removeElement($managedPromotion)) {
+            if ($managedPromotion->getPilote() === $this) {
+                $managedPromotion->setPilote(null);
+            }
+        }
 
         return $this;
     }
