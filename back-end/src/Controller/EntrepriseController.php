@@ -10,6 +10,10 @@ use App\Entity\Localite;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\EntrepriseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Response;
+
+
 
 /**
  * @Route("/api", name="api_")
@@ -56,7 +60,7 @@ class EntrepriseController extends AbstractController
         foreach ($entreprise->getLocalites() as $localite) {
             $localites[] = [
                 'id' => $localite->getId(),
-                'name' => $localite->getName(),
+                'nom' => $localite->getName(),
             ];
         }
 
@@ -105,44 +109,44 @@ class EntrepriseController extends AbstractController
 
         return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
     }
+
+
     /**
-     * @Route("/entreprise/{id}", name="app_update_data", methods={"PATCH"})
+     * @Route("/entreprise/{id}", name="update_entreprise", methods={"PUT"})
      */
-    public function updateData(Request $request, Entreprise $entreprise): JsonResponse
+    public function update(ManagerRegistry $doctrine, Request $request, int $id): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $em = $doctrine->getManager();
+        $entreprise = $em->getRepository(Entreprise::class)->find($id);
 
-        if (isset($data["nom"])) {
-            $entreprise->setNom($data['nom']);
+        if (!$entreprise) {
+            return $this->json(['message' => 'Entreprise non trouvée'], Response::HTTP_NOT_FOUND);
         }
-        if (isset($data["secteur_act"])) {
-            $entreprise->setSecteurAct($data['secteur_act']);
-        }
-        if (isset($data["nb_stage_cesi"])) {
-            $entreprise->setNbStagCesi($data['nb_stage_cesi']);
-        }
-        if (isset($data['localite'])) {
-            $localiteIds = $data['localite'];
-            $localites = [];
 
-            foreach ($localiteIds as $localiteId) {
-                $localite = $this->entityManager->getRepository(Localite::class)->find($localiteId);
+        $decoded = json_decode($request->getContent());
+        $nom = $decoded->nom;
+        $secteurAct = $decoded->secteur_act;
+        $nbStagCesi = $decoded->nb_stage_cesi;
 
-                if ($localite) {
-                    $localites[] = $localite;
-                }
-            }
+        $entreprise->setNom($nom);
+        $entreprise->setSecteurAct($secteurAct);
+        $entreprise->setNbStagCesi($nbStagCesi);
 
-            foreach ($localites as $localite) {
+        // Clear the current localites
+        $entreprise->getLocalites()->clear();
+
+        // Add the new localites
+        foreach ($decoded->localite as $localiteId) {
+            $localite = $em->getRepository(Localite::class)->find($localiteId);
+
+            if ($localite) {
                 $entreprise->addLocalite($localite);
             }
         }
 
+        $em->flush();
 
-        $this->entityManager->persist($entreprise);
-        $this->entityManager->flush();
-
-        return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
+        return $this->json(['message' => 'Entreprise mise à jour avec succès']);
     }
 
 

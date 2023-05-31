@@ -6,10 +6,14 @@ use App\Repository\LocaliteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
+
 
 #[ORM\Entity(repositoryClass: LocaliteRepository::class)]
 class Localite
 {
+    private EntityManagerInterface $entityManager;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -22,8 +26,11 @@ class Localite
     #[ORM\JoinTable(name: "entreprise_localite")]
     private Collection $entreprises;
 
-    public function __construct()
+    public function __construct(EntityManagerInterface $entityManager)
+
     {
+        $this->entityManager = $entityManager;
+
         $this->entreprises = new ArrayCollection();
     }
 
@@ -64,7 +71,16 @@ class Localite
         if ($this->entreprises->removeElement($entreprise)) {
             $entreprise->removeLocalite($this);
         }
+        if ($this->entreprises->isEmpty()) {
+            // Supprime la localité de la base de données
+            $this->deleteFromDatabase();
+        }
 
         return $this;
+    }
+    private function deleteFromDatabase(): void
+    {
+        $this->entityManager->remove($this);
+        $this->entityManager->flush();
     }
 }
