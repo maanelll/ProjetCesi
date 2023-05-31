@@ -19,7 +19,7 @@ class Entreprise
     private ?string $Nom = null;
     #[ORM\Column(length: 255)]
     private ?string $Secteur_Act = null;
-    #[ORM\ManyToMany(targetEntity: Localite::class, mappedBy: "entreprises", cascade: ['persist'])]
+    #[ORM\ManyToMany(targetEntity: Localite::class, mappedBy: "entreprises", cascade: ['remove'])]
     private Collection $localites;
     public function __construct()
     {

@@ -65,7 +65,7 @@ class LocaliteController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $localite = new Localite();
+        $localite = new Localite($entityManager);
         $localite->setName($data['name']);
 
         $entityManager->persist($localite);
