@@ -4,14 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Competence;
 use App\Entity\OffreStage;
-use App\Entity\Promotion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OffreStageRepository;
-use Doctrine\ORM\Mapping\Entity;
 use DateTimeImmutable;
 
 

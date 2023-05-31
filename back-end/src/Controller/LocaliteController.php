@@ -37,7 +37,7 @@ class LocaliteController extends AbstractController
 
             $data = [
                 'id' => $localite->getId(),
-                'name' => $localite->getName(),
+                'nom' => $localite->getName(),
             ];
 
             return new JsonResponse($data);
@@ -49,7 +49,7 @@ class LocaliteController extends AbstractController
         foreach ($localites as $localite) {
             $data[] = [
                 'id' => $localite->getId(),
-                'name' => $localite->getName(),
+                'nom' => $localite->getName(),
             ];
         }
 
@@ -61,12 +61,12 @@ class LocaliteController extends AbstractController
     /**
      * @Route("/localite", name="create_localite", methods={"POST"})
      */
-    public function createLocalite(Request $request, EntityManagerInterface $entityManager, LocaliteRepository $localiteRepository): JsonResponse
+    public function createLocalite(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         $localite = new Localite($entityManager);
-        $localite->setName($data['name']);
+        $localite->setName($data['nom']);
 
         $entityManager->persist($localite);
         $entityManager->flush();
@@ -84,7 +84,7 @@ class LocaliteController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $localite->setName($data['name']);
+        $localite->setName($data['nom']);
 
 
         $this->entityManager->persist($localite);
