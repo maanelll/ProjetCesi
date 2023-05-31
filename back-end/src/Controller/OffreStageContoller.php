@@ -16,7 +16,7 @@ use DateTimeImmutable;
 /**
  * @Route("/api", name="api_")
  */
-class OffreStageContollerController extends AbstractController
+class OffreStageContoller extends AbstractController
 {
     private $entityManager;
     public function __construct(EntityManagerInterface $entityManager)
