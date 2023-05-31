@@ -1,10 +1,10 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { Box, Button, Rating, Typography } from "@mui/material";
-import { DataGrid, GridCellParams, GridColDef} from '@mui/x-data-grid';
+import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../types";
-import AuthContext from "../../../config/AuthContext";
+import AuthContext from "../../../config/authContext";
 
 
 const EntreprisesList: React.FC = () => {
@@ -38,7 +38,7 @@ const EntreprisesList: React.FC = () => {
     });
   }, []);
   const formatLocalites = (localite: ILocalite[]) => {
-    return localite.map((localite) => localite.name).join(", ");
+    return localite.map((localite) => localite.nom).join(", ");
   };
 
 const columns: GridColDef[] = [
@@ -58,13 +58,17 @@ const columns: GridColDef[] = [
     renderCell: (params) => (
       <Rating name={`rating-${params.row.id}`} value={params.value} readOnly  />
       ),
-  },
-  {
-    field: "conf_pilote",
-    headerName: "Confiance de pilote de promo",
-    width: 200,
-    renderCell: (params) => (
-        <Rating name={`rating-${params.row.id}`} value={params.value} readOnly  />
+    },
+    {
+      field: "conf_pilote",
+      headerName: "Confiance de pilote de promo",
+      width: 200,
+      renderCell: (params) => (
+        <Rating
+          name={`rating-${params.row.id}`}
+          value={params.value}
+          readOnly
+        />
       ),
   },
   {
@@ -101,9 +105,9 @@ const columns: GridColDef[] = [
         <div style={{ height: 300, width: "100%" }}>
           <DataGrid<IEntreprise> rows={entreprise} columns={columns} autoPageSize getRowId={(row) => row.id} />
         </div>
-      </Box>          
-        </>
-    );
+      </Box>
+    </>
+  );
 };
 
 export default EntreprisesList;

@@ -1,7 +1,7 @@
 import { useState, FormEvent, useContext, useEffect } from 'react';
 import './loginStyle.css';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import AuthContext from '../../config/AuthContext';
+import AuthContext from '../../config/authContext';
 import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 

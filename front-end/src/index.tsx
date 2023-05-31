@@ -1,11 +1,9 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from "react-router-dom"
-import { initAxios } from './config/axios';
 import AuthProvider from './config/AuthProvider';
-import AuthContext from './config/AuthContext';
 
 
 const root = ReactDOM.createRoot(

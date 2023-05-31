@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../../types";
-import AuthContext from "../../../../config/AuthContext";
+import AuthContext from "../../../../config/authContext";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 
@@ -40,15 +40,16 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   const handleAddLocalite = () => {
   if (localiteInput.trim() !== "") {
     const localiteData = {
-      name: localiteInput.trim()
+      nom: localiteInput.trim()
     };
 
     axios.post("http://localhost:8000/api/localite", localiteData, config)
       .then((response) => {
         const newLocalite = {
           id: response.data.localite,
-          name: localiteData.name
+          nom: localiteData.nom
         };
+        console.log(response.data)
         setEntreprise((prevData) => {
           const updatedLocalites = [...prevData.localite, newLocalite];
           return {
@@ -64,11 +65,6 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
       });
   }
 };
-
-
-
-
-
   const handleRemoveLocalite = (localiteId: number) => {
   // Make API request to delete the localite
   axios.delete(`http://localhost:8000/api/localite/${localiteId}`, config)
@@ -153,7 +149,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
 
         {entreprise.localite.map((localite: ILocalite) => (
         <Box key={localite.id} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-          <Typography>{localite.name}</Typography>
+          <Typography>{localite.nom}</Typography>
           <IconButton onClick={() => handleRemoveLocalite(localite.id)}>
             <DeleteIcon />
           </IconButton>

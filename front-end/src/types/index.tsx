@@ -8,5 +8,5 @@ export interface IEntreprise {
 
 export interface ILocalite {
     id: number
-    name:string
+    nom:string
 }

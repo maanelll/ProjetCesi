@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import React from 'react';
 import Login from '../Login';
 import { useContext } from 'react';
-import AuthContext from '../../config/AuthContext';
+import AuthContext from '../../config/authContext';
 
 const Dashboard: React.FC = () => {
   const { isAuthenticated } = useContext(AuthContext);

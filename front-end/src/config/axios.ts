@@ -1,5 +1,5 @@
 import axios from "axios"
-import { AuthContextType } from "./AuthContext"
+import { AuthContextType } from "./authContext"
 
 function setBaseUrl() {
   axios.defaults.baseURL = `http://localhost:8080/api`

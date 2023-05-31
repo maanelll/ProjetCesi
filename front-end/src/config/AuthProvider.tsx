@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import AuthContext from './AuthContext';
+import AuthContext from './authContext';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthProviderProps {
