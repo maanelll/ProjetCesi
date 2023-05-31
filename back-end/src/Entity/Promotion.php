@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PromotionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PromotionRepository::class)]
 class Promotion
@@ -14,12 +15,21 @@ class Promotion
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
+     #[ORM\Column(length: 255)]
     private ?string $promo = null;
 
-    #[ORM\ManyToMany(targetEntity: OffreStage::class, inversedBy: "Promotion")]
-    #[ORM\JoinTable(name: "OffreStage_Promotion")]
-    private Collection $offrestages;
+    #[ORM\OneToMany(mappedBy: 'promotion',targetEntity : User::class)]
+    private Collection $students;
+    
+
+    #[ORM\ManyToOne(inversedBy:'managedPromotions',targetEntity: User::class)]
+    #[ORM\JoinColumn(name:"pilote_id", referencedColumnName:"id", nullable: true)]
+    private ?User $pilote = null;
+
+    public function __construct()
+    {
+        $this->students = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -34,25 +44,41 @@ class Promotion
     public function setPromo(string $promo): self
     {
         $this->promo = $promo;
-
-        return $this;
-    }
-    public function addOffreStage(OffreStage $offrestage): self
-    {
-        if (!$this->offrestages->contains($offrestage)) {
-            $this->offrestages[] = $offrestage;
-            $offrestage->addPromotion($this);
-        }
-
         return $this;
     }
 
-    public function removeOffreStage(OffreStage $offrestage): self
+    public function getStudents(): Collection
     {
-        if ($this->offrestages->removeElement($offrestage)) {
-            $offrestage->removePromotion($this);
-        }
+        return $this->students;
+    }
 
+    public function addStudent(User $student): self
+    {
+        if (!$this->students->contains($student)) {
+            $this->students[] = $student;
+            $student->setPromotion($this);
+        }
+        return $this;
+    }
+
+    public function removeStudent(User $student): self
+    {
+        if ($this->students->removeElement($student)) {
+            if ($student->getPromotion() === $this) {
+                $student->setPromotion(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getPilote(): ?User
+    {
+        return $this->pilote;
+    }
+
+    public function setPilote(?User $pilote): self
+    {
+        $this->pilote = $pilote;
         return $this;
     }
 }
