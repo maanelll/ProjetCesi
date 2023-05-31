@@ -1,21 +1,26 @@
-import { Box, Button, Rating, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, Rating, TextField, Typography } from "@mui/material";
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../../types";
 import AuthContext from "../../../../config/authContext";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
+interface CreateEntrepriseProps {
+  isEditMode: boolean;
+  existingEntreprise?: IEntreprise;
+}
 
-const CreateEntreprise = () => {
+const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEntreprise}) => {
   const navigate = useNavigate()
   const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise>({
-    id:0,
-    nom: "",
-    secteur_act: "",
-    nb_stage_cesi: 0,
-    localites: [],
+    id: isEditMode ? existingEntreprise?.id || 0 : 0,
+    nom: isEditMode ? existingEntreprise?.nom || "" : "",
+    secteur_act: isEditMode ? existingEntreprise?.secteur_act || "" : "",
+    nb_stage_cesi: isEditMode ? existingEntreprise?.nb_stage_cesi || 0 : 0,
+    localite: isEditMode ? existingEntreprise?.localite || [] : [],
   });
   const [localiteInput, setLocaliteInput] = useState("");
 
@@ -27,22 +32,55 @@ const CreateEntreprise = () => {
   //   const handleRatingChange = (value: number | null) => {
   //   setFormData((prevData) => ({ ...prevData, confiance: value || 0 }));
   // };
+
   const handleLocaliteInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   setLocaliteInput(e.target.value);
   };
+
   const handleAddLocalite = () => {
-    if (localiteInput.trim() !== "") {
-      const newLocalite: ILocalite = {
-        id: entreprise.localites.length + 1,
-        name: localiteInput,
-      };
+  if (localiteInput.trim() !== "") {
+    const localiteData = {
+      nom: localiteInput.trim()
+    };
+
+    axios.post("http://localhost:8000/api/localite", localiteData, config)
+      .then((response) => {
+        const newLocalite = {
+          id: response.data.localite,
+          nom: localiteData.nom
+        };
+        console.log(response.data)
+        setEntreprise((prevData) => {
+          const updatedLocalites = [...prevData.localite, newLocalite];
+          return {
+            ...prevData,
+            localite: updatedLocalites
+          };
+        });
+
+        setLocaliteInput(""); 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+};
+  const handleRemoveLocalite = (localiteId: number) => {
+  // Make API request to delete the localite
+  axios.delete(`http://localhost:8000/api/localite/${localiteId}`, config)
+    .then(() => {
+      // Remove the localite from the entreprise state
       setEntreprise((prevData) => ({
         ...prevData,
-        localites: [...prevData.localites, newLocalite],
+        localite: prevData.localite.filter((localite) => localite.id !== localiteId)
       }));
-      setLocaliteInput("");
-    }
-  };
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}` 
@@ -51,48 +89,30 @@ const CreateEntreprise = () => {
 
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const requestBody = {
+  e.preventDefault();
+
+  // Create an array of localite IDs
+  const localiteIds = entreprise.localite.map((localite) => localite.id);
+
+  // Create the entreprise data with the associated localite IDs
+  const entrepriseData = {
     nom: entreprise.nom,
     secteur_act: entreprise.secteur_act,
     nb_stage_cesi: entreprise.nb_stage_cesi,
-    localites:[]
-    };
-    const localite = {
-      name:localiteInput
-    }
-    
-    // const localiteRequests = entreprise.localites.map((localite) => {
-    //     return axios.post(`http://localhost:8000/api/localite`, localite, config);
-    //   });
-    const requestLocalite = axios.post(`http://localhost:8000/api/localite`, localite, config);
-    console.log(requestLocalite)
-    // Promise.all(localiteRequests)
-    // .then((localiteResponses) => {
-    //   const localiteIds = localiteResponses.map((response) => response.data.id);
-    //   const entrepriseData = {
-    //       ...entreprise,
-    //       localites: localiteIds,
-    //     };
-    //     return axios.post(`http://localhost:8000/api/entreprise`, entrepriseData, config);
-    // })
-    // .then((entrepriseResponse)=>{
-    //   const entrepriseId = entrepriseResponse.data.id;
-    //   const patchRequest = axios.patch(
-    //     `http://localhost:8000/api/entreprise/${entrepriseId}`,
-    //     {
-    //       id: entreprise.localites.map((localite) => localite.id),
-    //     }
-    //   );
-    //   return patchRequest;
-    // })
-    // .then(()=>{
-    //   navigate("/admin/entreprises");
-    // })
-    // .catch(error => {
-    //   console.error(error);
-    // });
+    localite: localiteIds
   };
+
+  // Post the entreprise data
+  axios.post("http://localhost:8000/api/entreprise", entrepriseData, config)
+    .then(() => {
+      navigate("/admin/entreprises");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+
     return (
         <Box sx={{ p: 3 }}>
       <Typography variant="h5" sx={{ mb: 3 }}>
@@ -127,9 +147,15 @@ const CreateEntreprise = () => {
           </Button>
         </Box>
 
-        {entreprise.localites.map((localite) => (
-          <Typography key={localite.id}>{localite.name}</Typography>
-        ))}
+        {entreprise.localite.map((localite: ILocalite) => (
+        <Box key={localite.id} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+          <Typography>{localite.nom}</Typography>
+          <IconButton onClick={() => handleRemoveLocalite(localite.id)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+))}
+
 
 
         <TextField
