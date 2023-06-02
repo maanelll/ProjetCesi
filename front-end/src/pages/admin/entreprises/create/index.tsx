@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Rating, TextField, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../../types";
@@ -10,9 +10,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 interface CreateEntrepriseProps {
   isEditMode: boolean;
   existingEntreprise?: IEntreprise;
+  existingLocalite?: ILocalite[];
 }
 
-const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEntreprise}) => {
+const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEntreprise, existingLocalite}) => {
   const navigate = useNavigate()
   const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise>({
@@ -20,7 +21,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     nom: isEditMode ? existingEntreprise?.nom || "" : "",
     secteur_act: isEditMode ? existingEntreprise?.secteur_act || "" : "",
     nb_stage_cesi: isEditMode ? existingEntreprise?.nb_stage_cesi || 0 : 0,
-    localite: isEditMode ? existingEntreprise?.localite || [] : [],
+    localite: isEditMode ? existingLocalite || [] : [],
   });
   const [localiteInput, setLocaliteInput] = useState("");
 
@@ -110,7 +111,8 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     .catch((error) => {
       console.error(error);
     });
-};
+  };
+  
 
 
     return (
