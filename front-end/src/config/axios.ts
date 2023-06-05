@@ -7,11 +7,13 @@ function setBaseUrl() {
 
 export function initAxios(authContext: AuthContextType) {
     setBaseUrl()
+    console.log(axios.defaults.baseURL)
     axios.interceptors.request.use(
         async function (config) {
             const token = await authContext.token;
             if (token) {
                 config.headers["Authorization"] = `Bearer ${token}`
+                config.headers["Accept"] = "application/json"
             }
             return config
         },

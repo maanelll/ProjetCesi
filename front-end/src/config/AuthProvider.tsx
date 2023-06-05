@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AuthContext from './authContext';
 import { useNavigate } from 'react-router-dom';
+import { initAxios } from './axios';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (username: string, password: string): Promise<void> => {
     try {
-      const response = await axios.post('http://localhost:8000/api/login_check', {
+      const response = await axios.post('/login_check', {
         username,
         password,
       });
