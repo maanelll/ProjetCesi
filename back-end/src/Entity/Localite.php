@@ -6,49 +6,36 @@ use App\Repository\LocaliteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
-
 
 #[ORM\Entity(repositoryClass: LocaliteRepository::class)]
 class Localite
 {
-    private EntityManagerInterface $entityManager;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $address = null;
+
+    #[ORM\Column]
+    private ?int $code_postal = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $city = null;
 
     #[ORM\ManyToMany(targetEntity: Entreprise::class, inversedBy: "localites")]
     #[ORM\JoinTable(name: "entreprise_localite")]
     private Collection $entreprises;
 
-    public function __construct(EntityManagerInterface $entityManager)
-
+    public function __construct()
     {
-        $this->entityManager = $entityManager;
-
         $this->entreprises = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getEntreprises(): Collection
@@ -71,16 +58,43 @@ class Localite
         if ($this->entreprises->removeElement($entreprise)) {
             $entreprise->removeLocalite($this);
         }
-        if ($this->entreprises->isEmpty()) {
-            // Supprime la localité de la base de données
-            $this->deleteFromDatabase();
-        }
 
         return $this;
     }
-    private function deleteFromDatabase(): void
+
+    public function getAddress(): ?string
     {
-        $this->entityManager->remove($this);
-        $this->entityManager->flush();
+        return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCpNumber(): ?string
+    {
+        return $this->code_postal;
+    }
+
+    public function setCpNumber(string $cpNumber): self
+    {
+        $this->code_postal = $cpNumber;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
     }
 }
