@@ -8,5 +8,7 @@ export interface IEntreprise {
 
 export interface ILocalite {
     id: number
-    nom:string
+    address: string
+    city: string
+    postalCode: string
 }

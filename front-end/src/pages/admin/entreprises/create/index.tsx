@@ -23,7 +23,11 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     nb_stage_cesi: isEditMode ? existingEntreprise?.nb_stage_cesi || 0 : 0,
     localite: isEditMode ? existingLocalite || [] : [],
   });
-  const [localiteInput, setLocaliteInput] = useState("");
+  const [localiteInput, setLocaliteInput] = useState({
+  address: "",
+  city: "",
+  postalCode: ""
+});
 
   const handleChangeEntreprise = (e: React.ChangeEvent<HTMLInputElement>) => {
       
@@ -35,22 +39,30 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   // };
 
   const handleLocaliteInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setLocaliteInput(e.target.value);
-  };
+  const { name, value } = e.target;
+  setLocaliteInput((prevData) => ({ ...prevData, [name]: value }));
+};
 
   const handleAddLocalite = () => {
-  if (localiteInput.trim() !== "") {
+  if (
+    localiteInput.address.trim() !== "" &&
+    localiteInput.city.trim() !== "" &&
+    localiteInput.postalCode.trim() !== ""
+  ) {
     const localiteData = {
-      nom: localiteInput.trim()
+      address: localiteInput.address.trim(),
+      city: localiteInput.city.trim(),
+      postalCode: localiteInput.postalCode.trim()
     };
 
-    axios.post("http://localhost:8000/api/localite", localiteData, config)
+    axios
+      .post("http://localhost:8000/api/localite", localiteData, config)
       .then((response) => {
         const newLocalite = {
           id: response.data.localite,
-          nom: localiteData.nom
+          ...localiteData
         };
-        console.log(response.data)
+
         setEntreprise((prevData) => {
           const updatedLocalites = [...prevData.localite, newLocalite];
           return {
@@ -59,7 +71,11 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
           };
         });
 
-        setLocaliteInput(""); 
+        setLocaliteInput({
+          address: "",
+          city: "",
+          postalCode: ""
+        });
       })
       .catch((error) => {
         console.error(error);
@@ -68,12 +84,15 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
 };
   const handleRemoveLocalite = (localiteId: number) => {
   // Make API request to delete the localite
-  axios.delete(`http://localhost:8000/api/localite/${localiteId}`, config)
+  axios
+    .delete(`http://localhost:8000/api/localite/${localiteId}`, config)
     .then(() => {
       // Remove the localite from the entreprise state
       setEntreprise((prevData) => ({
         ...prevData,
-        localite: prevData.localite.filter((localite) => localite.id !== localiteId)
+        localite: prevData.localite.filter(
+          (localite) => localite.id !== localiteId
+        )
       }));
     })
     .catch((error) => {
@@ -136,27 +155,48 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-          <TextField
-            name="localiteInput"
-            label="Nouvelle localité"
-            variant="outlined"
-            fullWidth
-            value={localiteInput}
-            onChange={handleLocaliteInputChange}
-          />
-          <Button variant="contained" color="primary" onClick={handleAddLocalite}>
-            Ajouter
-          </Button>
-        </Box>
+    <TextField
+      name="address"
+      label="Adresse"
+      variant="outlined"
+      fullWidth
+      value={localiteInput.address}
+      onChange={handleLocaliteInputChange}
+    />
+    <TextField
+      name="city"
+      label="Ville"
+      variant="outlined"
+      fullWidth
+      value={localiteInput.city}
+      onChange={handleLocaliteInputChange}
+    />
+    <TextField
+      name="postalCode"
+      label="Code postal"
+      variant="outlined"
+      fullWidth
+      value={localiteInput.postalCode}
+      onChange={handleLocaliteInputChange}
+    />
+    <Button variant="contained" color="primary" onClick={handleAddLocalite}>
+      Ajouter
+    </Button>
+  </Box>
 
         {entreprise.localite.map((localite: ILocalite) => (
-        <Box key={localite.id} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-          <Typography>{localite.nom}</Typography>
+        <Box
+          key={localite.id}
+          sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
+        >
+          <Typography>
+            {localite.address}, {localite.city}, {localite.postalCode}
+          </Typography>
           <IconButton onClick={() => handleRemoveLocalite(localite.id)}>
             <DeleteIcon />
           </IconButton>
         </Box>
-))}
+        ))}
 
 
 
