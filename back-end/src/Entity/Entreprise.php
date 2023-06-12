@@ -16,9 +16,9 @@ class Entreprise
     #[ORM\Column]
     private ?int $id = null;
     #[ORM\Column(length: 255)]
-    private ?string $Nom = null;
+    private ?string $name = null;
     #[ORM\Column(length: 255)]
-    private ?string $Secteur_Act = null;
+    private ?string $activity_area = null;
     #[ORM\ManyToMany(targetEntity: Localite::class, mappedBy: "entreprises", cascade: ['remove'])]
     private Collection $localites;
     public function __construct()
@@ -26,27 +26,27 @@ class Entreprise
         $this->localites = new ArrayCollection();
     }
     #[ORM\Column(nullable: true)]
-    private ?int $nb_stag_Cesi = null;
+    private ?int $nb_cesi = null;
     public function getId(): ?int
     {
         return $this->id;
     }
-    public function getNom(): ?string
+    public function getName(): ?string
     {
-        return $this->Nom;
+        return $this->name;
     }
-    public function setNom(string $Nom): self
+    public function setName(string $name): self
     {
-        $this->Nom = $Nom;
+        $this->name = $name;
         return $this;
     }
-    public function getSecteurAct(): ?string
+    public function getActivity_area(): ?string
     {
-        return $this->Secteur_Act;
+        return $this->activity_area;
     }
-    public function setSecteurAct(string $Secteur_Act): self
+    public function setActivity_area(string $activity_area): self
     {
-        $this->Secteur_Act = $Secteur_Act;
+        $this->activity_area = $activity_area;
         return $this;
     }
     public function addLocalite(Localite $localite): self
@@ -68,13 +68,13 @@ class Entreprise
     {
         return $this->localites;
     }
-    public function getNbStagCesi(): ?int
+    public function getNb_cesi(): ?int
     {
-        return $this->nb_stag_Cesi;
+        return $this->nb_cesi;
     }
-    public function setNbStagCesi(?int $nb_stag_Cesi): self
+    public function setNb_cesi(?int $nb_cesi): self
     {
-        $this->nb_stag_Cesi = $nb_stag_Cesi;
+        $this->nb_cesi = $nb_cesi;
         return $this;
     }
 }
