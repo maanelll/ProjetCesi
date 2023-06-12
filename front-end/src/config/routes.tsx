@@ -8,6 +8,8 @@ const CreateEntreprise = lazy(() => import("../pages/admin/entreprises/create"))
 const EditEntreprise = lazy(()=> import("../pages/admin/entreprises/[id]/editEntreprise"))
 const AddOffreStageForm = lazy(() => import("../pages/admin/entreprises/[id]/addOffreStageForm"))
 const Etudiants = lazy(() => import("../pages/admin/etudiants"))
+const  EditEtudiant = lazy(()=> import("../pages/admin/etudiants/[id]/editEtudiant"))
+const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"))
 
 
 const AppRoutes = () => {
@@ -27,6 +29,7 @@ const AppRoutes = () => {
         {
             path: "/admin/entreprises/:entrepriseId/edit",
             element: <EditEntreprise/>
+            
         },
         {
             path: "/admin/entreprises/create",
@@ -39,6 +42,14 @@ const AppRoutes = () => {
         {
             path: "/admin/etudiants",
             element: <Etudiants/>
+        },
+           {
+            path: "/admin/etudiants/:etudiantId/edit",
+            element: <EditEtudiant/>
+        },
+        {
+            path: "/admin/etudiants/create",
+            element: <CreateEtudiant isEditMode={false}/>
         }
         
     ])

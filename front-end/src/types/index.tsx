@@ -11,4 +11,22 @@ export interface ILocalite {
     address: string
     code_postal: string
     city: string
+    nom:string
+}
+export interface IEtudiant {
+    id: number
+    nom: string
+    prenom:string
+    email: string
+    motdepasse:string
+    centre: string
+    promotion :string
+}
+export interface ICentre {
+    id: number
+    centre:string
+}
+export interface IPromotion {
+    id: number
+    prom:string
 }
