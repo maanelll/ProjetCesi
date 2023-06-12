@@ -17,16 +17,16 @@ class OffreStage
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $duree_stag = null;
+    private ?int $internship_duration = null;
 
     #[ORM\Column(nullable: true)]
-    private ?float $base_renum = null;
+    private ?float $compensation_basis = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_offre = null;
+    private ?\DateTimeInterface $offer_date = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $nb_places_offert = null;
+    private ?int $nb_places_offered = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -35,6 +35,8 @@ class OffreStage
     private Collection $competences;
 
     #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: 'offreStages')]
+    #[ORM\JoinColumn(name: "promotion_id", referencedColumnName: "id")]
+
     private ?Promotion $promotion = null;
 
     public function __construct()
@@ -49,50 +51,50 @@ class OffreStage
         return $this->id;
     }
 
-    public function getDureeStag(): ?int
+    public function getInternship_duration(): ?int
     {
-        return $this->duree_stag;
+        return $this->internship_duration;
     }
 
-    public function setDureeStag(int $duree_stag): self
+    public function setInternship_duration(int $internship_duration): self
     {
-        $this->duree_stag = $duree_stag;
+        $this->internship_duration = $internship_duration;
 
         return $this;
     }
 
-    public function getBaseRenum(): ?float
+    public function getCompensation_basis(): ?float
     {
-        return $this->base_renum;
+        return $this->compensation_basis;
     }
 
-    public function setBaseRenum(?float $base_renum): self
+    public function setCompensation_basis(?float $compensation_basis): self
     {
-        $this->base_renum = $base_renum;
+        $this->compensation_basis = $compensation_basis;
 
         return $this;
     }
 
-    public function getDateOffre(): ?\DateTimeInterface
+    public function getOffer_date(): ?\DateTimeInterface
     {
-        return $this->date_offre;
+        return $this->offer_date;
     }
 
-    public function setDateOffre(?\DateTimeInterface $date_offre): self
+    public function setOffer_date(?\DateTimeInterface $offer_date): self
     {
-        $this->date_offre = $date_offre;
+        $this->offer_date = $offer_date;
 
         return $this;
     }
 
-    public function getNbPlacesOffert(): ?int
+    public function getNb_places_offered(): ?int
     {
-        return $this->nb_places_offert;
+        return $this->nb_places_offered;
     }
 
-    public function setNbPlacesOffert(?int $nb_places_offert): self
+    public function setNb_places_offered(?int $nb_places_offered): self
     {
-        $this->nb_places_offert = $nb_places_offert;
+        $this->nb_places_offered = $nb_places_offered;
 
         return $this;
     }
@@ -147,31 +149,4 @@ class OffreStage
 
         return $this;
     }
-
-    // /**
-    //  * @return Collection<int, Promotion>
-    //  */
-    // public function getPromotions(): Collection
-    // {
-    //     return $this->promotions;
-    // }
-
-    // public function addPromotion(Promotion $promotion): self
-    // {
-    //     if (!$this->promotions->contains($promotion)) {
-    //         $this->promotions->add($promotion);
-    //         $promotion->addOffreStage($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removePromotion(Promotion $promotion): self
-    // {
-    //     if ($this->promotions->removeElement($promotion)) {
-    //         $promotion->removeOffreStage($this);
-    //     }
-
-    //     return $this;
-    // }
 }

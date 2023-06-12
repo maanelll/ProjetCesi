@@ -34,10 +34,10 @@ class OffreStageContoller extends AbstractController
             $responseData[] = [
                 'id' => $offreStage->getId(),
                 'name' => $offreStage->getName(),
-                'duree_stag' => $offreStage->getDureeStag(),
-                'base_renum' => $offreStage->getBaseRenum(),
-                'date_offre' => $offreStage->getDateOffre()->format('Y-m-d'),
-                'nb_places_offert' => $offreStage->getNbPlacesOffert(),
+                'internship_duration' => $offreStage->getInternship_duration(),
+                'compensation_basis' => $offreStage->getCompensation_basis(),
+                'offer_date' => $offreStage->getOffer_date()->format('Y-m-d'),
+                'nb_places_offered' => $offreStage->getNb_places_offered(),
             ];
         }
         return new JsonResponse($responseData);
@@ -50,11 +50,26 @@ class OffreStageContoller extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $offrestage = new OffreStage();
-        $offrestage->setName($data['name']);
-        $offrestage->setDureeStag($data['duree_stag']);
-        $offrestage->setBaseRenum($data['base_renum']);
-        $offrestage->setDateOffre(DateTimeImmutable::createFromFormat('Y-m-d', $data['date_offre']));
-        $offrestage->setNbPlacesOffert($data['nb_places_offert']);
+
+        if (isset($data['name'])) {
+            $offrestage->setName($data['name']);
+        }
+
+        if (isset($data['internship_duration'])) {
+            $offrestage->setInternship_duration((int)$data['internship_duration']);
+        }
+
+        if (isset($data['compensation_basis'])) {
+            $offrestage->setCompensation_basis($data['compensation_basis']);
+        }
+
+        if (isset($data['offer_date'])) {
+            $offrestage->setOffer_date(DateTimeImmutable::createFromFormat('Y-m-d', $data['offer_date']));
+        }
+
+        if (isset($data['nb_places_offered'])) {
+            $offrestage->setNb_places_offered($data['nb_places_offered']);
+        }
 
         $entityManager->persist($offrestage);
         $entityManager->flush();
@@ -69,10 +84,10 @@ class OffreStageContoller extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $offrestage->setName($data['name']);
-        $offrestage->setDureeStag($data['duree_stag']);
-        $offrestage->setBaseRenum($data['base_renum']);
-        $offrestage->setDateOffre(DateTimeImmutable::createFromFormat('Y-m-d', $data['date_offre']));
-        $offrestage->setNbPlacesOffert($data['nb_places_offert']);
+        $offrestage->setInternship_duration($data['internship_duration']);
+        $offrestage->setCompensation_basis($data['compensation_basis']);
+        $offrestage->setOffer_date(DateTimeImmutable::createFromFormat('Y-m-d', $data['offer_date']));
+        $offrestage->setNb_places_offered($data['nb_places_offered']);
 
         $competenceIds = $data['competence'];
         // $promortionIds = $data['promotion'];
