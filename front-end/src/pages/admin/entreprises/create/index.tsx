@@ -17,9 +17,9 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise>({
     id: isEditMode ? existingEntreprise?.id || 0 : 0,
-    nom: isEditMode ? existingEntreprise?.nom || "" : "",
-    secteur_act: isEditMode ? existingEntreprise?.secteur_act || "" : "",
-    nb_stage_cesi: isEditMode ? existingEntreprise?.nb_stage_cesi || 0 : 0,
+    name: isEditMode ? existingEntreprise?.name || "" : "",
+    activity_area: isEditMode ? existingEntreprise?.activity_area || "" : "",
+    nb_cesi: isEditMode ? existingEntreprise?.nb_cesi || 0 : 0,
     localite: isEditMode ? existingEntreprise?.localite || [] : [],
   });
   const [localiteInput, setLocaliteInput] = useState("");
@@ -40,14 +40,18 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   const handleAddLocalite = () => {
   if (localiteInput.trim() !== "") {
     const localiteData = {
-      nom: localiteInput.trim()
+      address: localiteInput.trim(),
+      code_postal: localiteInput.trim(),
+      city: localiteInput.trim()
     };
 
     axios.post("http://localhost:8000/api/localite", localiteData, config)
       .then((response) => {
         const newLocalite = {
           id: response.data.localite,
-          nom: localiteData.nom
+          address: localiteData.address,
+          code_postal: localiteData.code_postal,
+          city: localiteData.city
         };
         console.log(response.data)
         setEntreprise((prevData) => {
@@ -96,9 +100,9 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
 
   // Create the entreprise data with the associated localite IDs
   const entrepriseData = {
-    nom: entreprise.nom,
-    secteur_act: entreprise.secteur_act,
-    nb_stage_cesi: entreprise.nb_stage_cesi,
+    nom: entreprise.name,
+    secteur_act: entreprise.activity_area,
+    nb_stage_cesi: entreprise.nb_cesi,
     localite: localiteIds
   };
 
@@ -126,7 +130,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
           variant="outlined"
           fullWidth
           margin="normal"
-          value={entreprise.nom}
+          value={entreprise.name}
           onChange={handleChangeEntreprise}
         />
         <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
@@ -149,7 +153,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
 
         {entreprise.localite.map((localite: ILocalite) => (
         <Box key={localite.id} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-          <Typography>{localite.nom}</Typography>
+          <Typography>{localite.city}</Typography>
           <IconButton onClick={() => handleRemoveLocalite(localite.id)}>
             <DeleteIcon />
           </IconButton>
@@ -164,7 +168,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
           variant="outlined"
           fullWidth
           margin="normal"
-          value={entreprise.secteur_act}
+          value={entreprise.activity_area}
           onChange={handleChangeEntreprise}
         />
 
@@ -175,7 +179,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
           variant="outlined"
           fullWidth
           margin="normal"
-          value={entreprise.nb_stage_cesi}
+          value={entreprise.nb_cesi}
           onChange={handleChangeEntreprise}
         />
 

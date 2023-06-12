@@ -37,20 +37,20 @@ const EntreprisesList: React.FC = () => {
       console.error("Error fetching data:", error);
     });
   }, []);
-  const formatLocalites = (localite: ILocalite[]) => {
-    return localite.map((localite) => localite.nom).join(", ");
-  };
+  // const formatLocalites = (localite: ILocalite[]) => {
+  //   return localite.map((localite) => localite.nom).join(", ");
+  // };
 
 const columns: GridColDef[] = [
-  { field: "nom", headerName: "Nom", width: 100 },
+  { field: "name", headerName: "Nom", width: 100 },
   {
       field: "localite",
       headerName: "Localités",
       width: 200,
-      renderCell: (params) => <Typography>{formatLocalites(params.row.localites)}</Typography>,
+      // renderCell: (params) => <Typography>{formatLocalites(params.row.localites)}</Typography>,
     },
-  { field: "secteur_act", headerName: "Secteur d'activité", width: 200 },
-  { field: "nb_stage_cesi", headerName: "Nombre de Stagiaire", width: 150 },
+  { field: "activity_area", headerName: "Secteur d'activité", width: 200 },
+  { field: "nb_cesi", headerName: "Nombre de Stagiaire", width: 150 },
   {
     field: "eval_stag",
     headerName: "Evaluation des stagiaires",
