@@ -60,16 +60,18 @@ class EntrepriseController extends AbstractController
         foreach ($entreprise->getLocalites() as $localite) {
             $localites[] = [
                 'id' => $localite->getId(),
-                'nom' => $localite->getName(),
+                'city' => $localite->getCity(),
+                'code_postal' => $localite->getCpNumber(),
+                'adress' => $localite->getAddress()
             ];
         }
 
         return [
             'id' => $entreprise->getId(),
-            'nom' => $entreprise->getNom(),
-            'secteur_act' => $entreprise->getSecteurAct(),
+            'name' => $entreprise->getName(),
+            'activity_area' => $entreprise->getActivity_area(),
             'localites' => $localites,
-            'nb_stage_cesi' => $entreprise->getNbStagCesi(),
+            'nb_cesi' => $entreprise->getNb_cesi(),
         ];
     }
 
@@ -82,11 +84,11 @@ class EntrepriseController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $entreprise = new Entreprise();
-        $entreprise->setNom($data['nom']);
-        $entreprise->setSecteurAct($data['secteur_act']);
+        $entreprise->setName($data['name']);
+        $entreprise->setActivity_area($data['activity_area']);
 
-        $entreprise->setNbStagCesi($data['nb_stage_cesi']);
-        $localiteIds = $data['localite'] ?? [];
+        $entreprise->setNb_cesi($data['nb_cesi']);
+        $localiteIds = $data['localities'] ?? [];
         $localites = [];
 
         foreach ($localiteIds as $localiteId) {
@@ -124,19 +126,23 @@ class EntrepriseController extends AbstractController
         }
 
         $decoded = json_decode($request->getContent());
-        $nom = $decoded->nom;
-        $secteurAct = $decoded->secteur_act;
-        $nbStagCesi = $decoded->nb_stage_cesi;
+        $name = $decoded->name;
+        $activity_area = $decoded->activity_area;
+        $nb_cesi = $decoded->nb_cesi;
 
-        $entreprise->setNom($nom);
-        $entreprise->setSecteurAct($secteurAct);
-        $entreprise->setNbStagCesi($nbStagCesi);
+        $entreprise->setName($name);
+        $entreprise->setActivity_area($activity_area);
+        $entreprise->setNb_cesi($nb_cesi);
 
-        // Clear the current localites
-        $entreprise->getLocalites()->clear();
+        // Remove all old localites from the entreprise
+        foreach ($entreprise->getLocalites() as $oldLocalite) {
+            $entreprise->removeLocalite($oldLocalite);
+        }
+
+        $em->flush();  // Persist changes to the database here
 
         // Add the new localites
-        foreach ($decoded->localite as $localiteId) {
+        foreach ($decoded->localities as $localiteId) {
             $localite = $em->getRepository(Localite::class)->find($localiteId);
 
             if ($localite) {
@@ -144,11 +150,10 @@ class EntrepriseController extends AbstractController
             }
         }
 
-        $em->flush();
+        $em->flush();  // And here, to save new localites
 
         return $this->json(['message' => 'Entreprise mise à jour avec succès']);
     }
-
 
     /**
      * @Route("/entreprise/{id}", name="app_delete_data", methods={"DELETE"})
