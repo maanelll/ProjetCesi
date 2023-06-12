@@ -10,3 +10,20 @@ export interface ILocalite {
     id: number
     nom:string
 }
+export interface IEtudiant {
+    id: number
+    nom: string
+    prenom:string
+    email: string
+    motdepasse:string
+    centre: string
+    promotion :string
+}
+export interface ICentre {
+    id: number
+    centre:string
+}
+export interface IPromotion {
+    id: number
+    prom:string
+}

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\CentreRepository;
+use App\Repository\CenterRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 
-#[ORM\Entity(repositoryClass: CentreRepository::class)]
-class Centre
+#[ORM\Entity(repositoryClass: CenterRepository::class)]
+class Center
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -15,27 +15,27 @@ class Centre
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nomCentre = null;
+    private ?string $centerName = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNomCentre(): ?string
+    public function getcenterName(): ?string
     {
-        return $this->nomCentre;
+        return $this->centerName;
     }
-    #[ORM\OneToMany(mappedBy: 'centre', targetEntity: User::class)]
+    #[ORM\OneToMany(mappedBy: 'center', targetEntity: User::class)]
     private Collection $users;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
     }
-    public function setNomCentre(string $nomCentre): self
+    public function setcenterName(string $centerName): self
     {
-        $this->nomCentre = $nomCentre;
+        $this->centerName = $centerName;
 
         return $this;
     }
@@ -52,7 +52,7 @@ class Centre
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->setCentre($this);
+            $user->setCenter($this);
         }
 
         return $this;
@@ -62,8 +62,8 @@ class Centre
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($user->getCentre() === $this) {
-                $user->setCentre(null);
+            if ($user->getCenter() === $this) {
+                $user->setCenter(null);
             }
         }
 

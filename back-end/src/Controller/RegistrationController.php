@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
+use App\Entity\Role;
   
 /**
  * @Route("/api", name="api_")
@@ -23,13 +24,18 @@ class RegistrationController extends AbstractController
     {
           
         $em = $doctrine->getManager();
+        $roleRepository = $doctrine->getRepository(Role::class); 
         $decoded = json_decode($request->getContent());
         $email = $decoded->email;
-        $nom = $decoded->nom;
-        $prenom = $decoded->prenom;
+        $firstName = $decoded->firstName;
+        $lastName = $decoded->lastName;
         $plaintextPassword = $decoded->password;
-        $role = $decoded->role; 
+        $roleId = $decoded->role; 
   
+        $role = $roleRepository->find($roleId);
+        if (!$role) {
+            throw $this->createNotFoundException('No role found with id ' . $roleId);
+        }
   
         $user = new User();
         $hashedPassword = $passwordHasher->hashPassword(
@@ -38,9 +44,9 @@ class RegistrationController extends AbstractController
         );
         $user->setPassword($hashedPassword);
         $user->setEmail($email);
-        $user->setNom($nom);
-        $user->setPrenom($prenom);
-        $user->setRoles([$role]);
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setRole($role); 
         $em->persist($user);
         $em->flush();
   

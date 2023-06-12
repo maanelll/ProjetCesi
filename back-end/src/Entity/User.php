@@ -20,8 +20,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column]
-    private array $roles = [];
+  #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: "users")]
+  #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id", nullable: false)]
+  private $role;
 
     /**
      * @var string The hashed password
@@ -30,20 +31,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nom = null;
+    private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $prenom = null;
+    private ?string $lastName = null;
 
     #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: "students")]
     #[ORM\JoinColumn(name: "promotion_id", referencedColumnName: "id", nullable: true)]
     private ?Promotion $promotion = null;
 
-    #[ORM\ManyToOne(targetEntity: Centre::class, inversedBy: "students")]
-    #[ORM\JoinColumn(name: "centre_id", referencedColumnName: "id", nullable: true)]
-    private ?Centre $centre = null;
+    #[ORM\ManyToOne(targetEntity: Center::class, inversedBy: "students")]
+    #[ORM\JoinColumn(name: "center_id", referencedColumnName: "id", nullable: true)]
+    private ?Center $center = null;
 
-    #[ORM\OneToMany(targetEntity: Promotion::class, mappedBy: "pilote")]
+    #[ORM\OneToMany(targetEntity: Promotion::class, mappedBy: "pilot")]
     private Collection $managedPromotions;
 
     public function __construct()
@@ -78,21 +79,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
+   public function getRole(): ?Role
     {
-        
-       return $this->roles;
-     }
+        return $this->role;
+    }
 
-    public function setRoles(array $roles): self
+    public function setRole(?Role $role): self
     {
-        $this->roles = $roles;
+        $this->role = $role;
 
         return $this;
     }
+
+   public function getRoles(): array
+{
+    return [$this->role->getName()];
+}
 
     /**
      * @see PasswordAuthenticatedUserInterface
@@ -118,25 +120,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getNom(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->nom;
+        return $this->firstName;
     }
 
-    public function setNom(string $nom): self
+    public function setFirstName(string $firstName): self
     {
-        $this->nom = $nom;
+        $this->firstName= $firstName;
 
         return $this;
     }
-     public function getPrenom(): ?string
+     public function getLastName(): ?string
     {
-        return $this->prenom;
+        return $this->lastName;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setLastName(string $lastName): self
     {
-        $this->prenom = $prenom;
+        $this->lastName= $lastName;
 
         return $this;
     }
@@ -153,14 +155,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-        public function getCentre(): ?Centre
+        public function getCenter(): ?Center
     {
-        return $this->centre;
+        return $this->center;
     }
 
-    public function setCentre(?Centre $centre): self
+    public function setCenter(?Center $center): self
     {
-        $this->centre = $centre;
+        $this->center = $center;
 
         return $this;
     }
@@ -177,7 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->managedPromotions->contains($managedPromotion)) {
             $this->managedPromotions->add($managedPromotion);
-            $managedPromotion->setPilote($this);
+            $managedPromotion->setPilot($this);
         }
 
         return $this;
@@ -186,8 +188,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeManagedPromotion(Promotion $managedPromotion): self
     {
         if ($this->managedPromotions->removeElement($managedPromotion)) {
-            if ($managedPromotion->getPilote() === $this) {
-                $managedPromotion->setPilote(null);
+            if ($managedPromotion->getPilot() === $this) {
+                $managedPromotion->setPilot(null);
             }
         }
 

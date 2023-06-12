@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Centre;
+use App\Entity\Center;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Centre>
+ * @extends ServiceEntityRepository<Center>
  *
- * @method Centre|null find($id, $lockMode = null, $lockVersion = null)
- * @method Centre|null findOneBy(array $criteria, array $orderBy = null)
- * @method Centre[]    findAll()
- * @method Centre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Center|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Center|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Center[]    findAll()
+ * @method Center[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CentreRepository extends ServiceEntityRepository
+class CenterRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Centre::class);
+        parent::__construct($registry, Center::class);
     }
 
-    public function save(Centre $entity, bool $flush = false): void
+    public function save(Center $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CentreRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Centre $entity, bool $flush = false): void
+    public function remove(Center $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class CentreRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Centre[] Returns an array of Centre objects
+//     * @return Center[] Returns an array of Center objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class CentreRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Centre
+//    public function findOneBySomeField($value): ?Center
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

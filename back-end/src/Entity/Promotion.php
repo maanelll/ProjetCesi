@@ -23,8 +23,8 @@ class Promotion
     
 
     #[ORM\ManyToOne(inversedBy:'managedPromotions',targetEntity: User::class)]
-    #[ORM\JoinColumn(name:"pilote_id", referencedColumnName:"id", nullable: true)]
-    private ?User $pilote = null;
+    #[ORM\JoinColumn(name:"pilot_id", referencedColumnName:"id", nullable: true)]
+    private ?User $pilot = null;
 
     public function __construct()
     {
@@ -71,14 +71,14 @@ class Promotion
         return $this;
     }
 
-    public function getPilote(): ?User
+    public function getPilot(): ?User
     {
-        return $this->pilote;
+        return $this->pilot;
     }
 
-    public function setPilote(?User $pilote): self
+    public function setPilot(?User $pilot): self
     {
-        $this->pilote = $pilote;
+        $this->pilot = $pilot;
         return $this;
     }
 }
