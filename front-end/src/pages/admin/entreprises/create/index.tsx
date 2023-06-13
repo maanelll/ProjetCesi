@@ -49,7 +49,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
       .then((response) => {
         const newLocalite = {
           id: response.data.localite,
-          address: localiteData.address,
+          adress: localiteData.address,
           code_postal: localiteData.code_postal,
           city: localiteData.city
         };

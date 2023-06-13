@@ -8,10 +8,9 @@ export interface IEntreprise {
 
 export interface ILocalite {
     id: number
-    address: string
+    adress: string
     code_postal: string
     city: string
-    nom:string
 }
 export interface IEtudiant {
     id: number
