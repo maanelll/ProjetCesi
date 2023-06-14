@@ -15,17 +15,19 @@ const AppLayout = ({ children }: AppLayoutPropsType) => {
         
     <div style={{ display: "flex", minHeight: "100vh" ,marginTop: 0}}>
       {isAuthenticated && (
-        <div style={{ flex: "0 0 220px" }}>
+        <div style={{ flex: "0 0 200px" }}>
           <Navbar />
         </div>
       )}
       <div style={{ flexGrow: 1}}>
-        <Box sx={{
+        {isAuthenticated &&(
+          <Box sx={{
           display: "flex",
           justifyContent: "center",
           marginBottom: "10px",}}>
           <Header/>
         </Box>
+        )}       
         {children}
         </div>
       </div>

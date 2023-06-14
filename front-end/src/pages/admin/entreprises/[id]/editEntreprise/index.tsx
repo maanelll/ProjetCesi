@@ -1,15 +1,21 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
 import { IEntreprise } from '../../../../../types';
 import axios from 'axios';
 import CreateEntreprise from '../../create';
+import AuthContext from '../../../../../config/authContext';
 
 const EditEntreprise = () => {
     const { entrepriseId } = useParams();
     const [entreprise, setEntreprise] = useState<IEntreprise | null>(null);
-    
+    const { token } = useContext(AuthContext);
+    const config = {
+    headers: {
+      Authorization: `Bearer ${token}` 
+    }
+  };
     useEffect(() => {
-    axios.get(`http://localhost:8000/api/entreprise/${entrepriseId}`)
+    axios.get(`http://localhost:8000/api/entreprise/${entrepriseId}`,config)
       .then(response => {
         setEntreprise(response.data);
       })
