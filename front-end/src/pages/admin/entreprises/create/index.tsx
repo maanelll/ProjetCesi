@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 interface CreateEntrepriseProps {
   isEditMode: boolean;
-  existingEntreprise?: IEntreprise;
+  existingEntreprise?: IEntreprise | null;
 }
 
 const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEntreprise}) => {
@@ -20,9 +20,14 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     name: isEditMode ? existingEntreprise?.name || "" : "",
     activity_area: isEditMode ? existingEntreprise?.activity_area || "" : "",
     nb_cesi: isEditMode ? existingEntreprise?.nb_cesi || 0 : 0,
-    localite: isEditMode ? existingEntreprise?.localite || [] : [],
+    localities: isEditMode ? existingEntreprise?.localities || [] : [],
   });
-  const [localiteInput, setLocaliteInput] = useState("");
+  const [localiteInput, setLocaliteInput] = useState<ILocalite>({
+    id: 0,
+    adress: "",
+    city: "",
+    code_postal: "",
+  });
 
   const handleChangeEntreprise = (e: React.ChangeEvent<HTMLInputElement>) => {
       
@@ -34,41 +39,50 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   // };
 
   const handleLocaliteInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setLocaliteInput(e.target.value);
+    const { name, value } = e.target;
+    setLocaliteInput((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleAddLocalite = () => {
-  if (localiteInput.trim() !== "") {
-    const localiteData = {
-      address: localiteInput.trim(),
-      code_postal: localiteInput.trim(),
-      city: localiteInput.trim()
-    };
+    if (
+      localiteInput.adress.trim() !== "" &&
+      localiteInput.city.trim() !== "" &&
+      localiteInput.code_postal.trim() !== ""
+    ) {
+      const localiteData: ILocalite = {
+        id: 0,
+        adress: localiteInput.adress.trim(),
+        city: localiteInput.city.trim(),
+        code_postal: localiteInput.code_postal.trim()
+      };
 
-    axios.post("http://localhost:8000/api/localite", localiteData, config)
-      .then((response) => {
-        const newLocalite = {
-          id: response.data.localite,
-          adress: localiteData.address,
-          code_postal: localiteData.code_postal,
-          city: localiteData.city
-        };
-        console.log(response.data)
-        setEntreprise((prevData) => {
-          const updatedLocalites = [...prevData.localite, newLocalite];
-          return {
-            ...prevData,
-            localite: updatedLocalites
+      axios
+        .post("http://localhost:8000/api/localite", localiteData, config)
+        .then((response) => {
+          const newLocalite: ILocalite = {
+            id: response.data.localite,
+            adress: localiteData.adress,
+            city: localiteData.city,
+            code_postal: localiteData.code_postal,
           };
-        });
+          console.log(newLocalite)
+          setEntreprise((prevData) => ({
+            ...prevData,
+            localities: [...prevData.localities, newLocalite],
+          }));
 
-        setLocaliteInput(""); 
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-};
+          setLocaliteInput({
+            id:0,
+            adress: "",
+            city: "",
+            code_postal: "",
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
   const handleRemoveLocalite = (localiteId: number) => {
   // Make API request to delete the localite
   axios.delete(`http://localhost:8000/api/localite/${localiteId}`, config)
@@ -76,7 +90,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
       // Remove the localite from the entreprise state
       setEntreprise((prevData) => ({
         ...prevData,
-        localite: prevData.localite.filter((localite) => localite.id !== localiteId)
+        localities: prevData.localities.filter((localities) => localities.id !== localiteId)
       }));
     })
     .catch((error) => {
@@ -96,24 +110,35 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
   e.preventDefault();
 
   // Create an array of localite IDs
-  const localiteIds = entreprise.localite.map((localite) => localite.id);
+  const localiteIds = entreprise.localities.map((localites) => localites.id);
 
   // Create the entreprise data with the associated localite IDs
   const entrepriseData = {
-    nom: entreprise.name,
-    secteur_act: entreprise.activity_area,
-    nb_stage_cesi: entreprise.nb_cesi,
-    localite: localiteIds
+    name: entreprise.name,
+    activity_area: entreprise.activity_area,
+    nb_cesi: entreprise.nb_cesi,
+    localities: localiteIds
   };
 
-  // Post the entreprise data
-  axios.post("http://localhost:8000/api/entreprise", entrepriseData, config)
-    .then(() => {
-      navigate("/admin/entreprises");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  if (isEditMode) {
+    // Edit mode: Update existing entreprise
+    axios.put(`http://localhost:8000/api/entreprise/${entreprise.id}`, entrepriseData, config)
+      .then(() => {
+        navigate("/admin/entreprises");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    // Create mode: Create new entreprise
+    axios.post("http://localhost:8000/api/entreprise", entrepriseData, config)
+      .then(() => {
+        navigate("/admin/entreprises");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 };
 
 
@@ -125,7 +150,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
 
       <form onSubmit={handleSubmit}>
         <TextField
-          name="nom"
+          name="name"
           label="Nom de l'entreprise"
           variant="outlined"
           fullWidth
@@ -137,33 +162,57 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
           Localités
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+        <Box
+          sx={{ display: "flex", flexDirection: "row", marginBottom: 2 }}
+        >
           <TextField
-            name="localiteInput"
-            label="Nouvelle localité"
+            name="adress"
+            label="Adresse"
             variant="outlined"
             fullWidth
-            value={localiteInput}
+            value={localiteInput.adress}
             onChange={handleLocaliteInputChange}
+            margin="normal"
+          />
+          <TextField
+            name="city"
+            label="Ville"
+            variant="outlined"
+            fullWidth
+            value={localiteInput.city}
+            onChange={handleLocaliteInputChange}
+            margin="normal"
+          />
+          <TextField
+            name="code_postal"
+            label="Code postal"
+            variant="outlined"
+            fullWidth
+            value={localiteInput.code_postal}
+            onChange={handleLocaliteInputChange}
+            margin="normal"
           />
           <Button variant="contained" color="primary" onClick={handleAddLocalite}>
             Ajouter
           </Button>
         </Box>
 
-        {entreprise.localite.map((localite: ILocalite) => (
-        <Box key={localite.id} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-          <Typography>{localite.city}</Typography>
-          <IconButton onClick={() => handleRemoveLocalite(localite.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-))}
-
-
-
+        {entreprise.localities.map((localities: ILocalite, index: number) => (
+          
+          <Box
+            key={localities.id}
+            sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
+          >
+            <Typography>
+              {localities.adress}, {localities.city}, {localities.code_postal}
+            </Typography>
+            <IconButton onClick={() => handleRemoveLocalite(localities.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        ))}
         <TextField
-          name="secteur_act"
+          name="activity_area"
           label="Secteur d'activité"
           variant="outlined"
           fullWidth
@@ -173,7 +222,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
         />
 
         <TextField
-          name="nb_stage_cesi"
+          name="nb_cesi"
           label="Nombre de stagiaires CESI"
           type="number"
           variant="outlined"

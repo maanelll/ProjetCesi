@@ -3,7 +3,7 @@ export interface IEntreprise {
     name: string
     activity_area: string
     nb_cesi:number
-    localite: ILocalite[]
+    localities: ILocalite[]
 }
 
 export interface ILocalite {

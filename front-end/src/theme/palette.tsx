@@ -43,7 +43,6 @@ const ORANGE_GRADIENT = "linear-gradient(183.6deg, #FDA42A 0%, #F08303 73.17%);"
 const BLUE_GRADIENT = "linear-gradient(183.6deg, #007bff 0%, #0056b3 73.17%);"
 const PURPLE_GRADIENT = "linear-gradient(183.6deg, #8A4DFF 0%, #AFA5D1 73.17%)"
 
-
 const palette = {
   primary: YELLOW,
   blue: BLUE,
