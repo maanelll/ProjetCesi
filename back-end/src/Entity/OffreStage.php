@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Competence;
+use App\Entity\Promotion;
+
 
 #[ORM\Entity(repositoryClass: OffreStageRepository::class)]
 class OffreStage
@@ -31,17 +34,18 @@ class OffreStage
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "offreStages")]
+    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "offreStages", cascade: ["remove"])]
+    #[ORM\JoinTable(name: "offrestage_competence")]
     private Collection $competences;
 
-    #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: 'offreStages')]
-    #[ORM\JoinColumn(name: "promotion_id", referencedColumnName: "id")]
-
-    private ?Promotion $promotion = null;
+    #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: 'offreStages', cascade: ["remove"])]
+    #[ORM\JoinTable(name: "offrestage_promotion")]
+    private Collection $promotions;
 
     public function __construct()
     {
         $this->competences = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
     }
 
     // Getters and setters
@@ -122,8 +126,8 @@ class OffreStage
     public function addCompetence(Competence $competence): self
     {
         if (!$this->competences->contains($competence)) {
-            $this->competences->add($competence);
-            $competence->addOffreStage($this);
+            $this->competences[] = $competence;
+            $competence->addOffreStage($this); // Also add this offreStage to the competence's collection
         }
 
         return $this;
@@ -138,14 +142,27 @@ class OffreStage
 
         return $this;
     }
-    public function getPromotion(): ?Promotion
+    public function getPromotions(): Collection
     {
-        return $this->promotion;
+        return $this->promotions;
     }
 
-    public function setPromotion(?Promotion $promotion): self
+    public function addPromotion(Promotion $promotion): self
     {
-        $this->promotion = $promotion;
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions[] = $promotion;
+            $promotion->addOffreStage($this); // Also add this offreStage to the promotion's collection
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): self
+    {
+        if ($this->promotions->contains($promotion)) {
+            $this->promotions->removeElement($promotion);
+            $promotion->removeOffreStage($this); // Also remove this offreStage from the promotion's collection
+        }
 
         return $this;
     }

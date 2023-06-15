@@ -39,7 +39,7 @@ class LocaliteController extends AbstractController
                 'id' => $localite->getId(),
                 'city' => $localite->getCity(),
                 'code_postal' => $localite->getCpNumber(),
-                'adress' => $localite->getAddress()
+                'address' => $localite->getAddress()
             ];
 
             return new JsonResponse($data);
@@ -53,7 +53,7 @@ class LocaliteController extends AbstractController
                 'id' => $localite->getId(),
                 'city' => $localite->getCity(),
                 'code_postal' => $localite->getCpNumber(),
-                'adress' => $localite->getAddress()
+                'address' => $localite->getAddress()
             ];
         }
 

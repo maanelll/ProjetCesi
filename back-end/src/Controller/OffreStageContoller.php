@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Competence;
 use App\Entity\OffreStage;
+use App\Entity\Promotion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,24 +25,66 @@ class OffreStageContoller extends AbstractController
         $this->entityManager = $entityManager;
     }
     /**
-     * @Route("/offrestage", name="get_offrestage", methods={"GET"} )
+     * @Route("/offrestage/{id?}", name="get_offrestage", methods={"GET"} )
      */
-    public function getOffreStage(OffreStageRepository $repository): JsonResponse
+    public function getOffreStage(OffreStageRepository $repository, $id = null): JsonResponse
     {
-        $data = $repository->findAll();
-        $responseData = [];
-        foreach ($data as $offreStage) {
-            $responseData[] = [
+        if ($id) {
+            $offreStage = $repository->find($id);
+
+            if (!$offreStage) {
+                return new JsonResponse(['message' => 'OffreStage not found'], JsonResponse::HTTP_NOT_FOUND);
+            }
+
+            $offer_date = $offreStage->getOffer_date();
+            $data = [
                 'id' => $offreStage->getId(),
                 'name' => $offreStage->getName(),
                 'internship_duration' => $offreStage->getInternship_duration(),
                 'compensation_basis' => $offreStage->getCompensation_basis(),
-                'offer_date' => $offreStage->getOffer_date()->format('Y-m-d'),
+                'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
+                'competences' => array_map(
+                    function ($competence) {
+                        return $competence->getId();
+                    },
+                    $offreStage->getCompetences()->toArray()
+                ),
+                'promotions' => array_map(function ($promotion) {
+                    return $promotion->getId();
+                }, $offreStage->getPromotions()->toArray())
+            ];
+
+            return new JsonResponse($data);
+        }
+
+        $offreStages = $repository->findAll();
+
+        $data = [];
+        foreach ($offreStages as $offreStage) {
+            $offer_date = $offreStage->getOffer_date();
+            $data[] = [
+                'id' => $offreStage->getId(),
+                'name' => $offreStage->getName(),
+                'internship_duration' => $offreStage->getInternship_duration(),
+                'compensation_basis' => $offreStage->getCompensation_basis(),
+                'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
+                'nb_places_offered' => $offreStage->getNb_places_offered(),
+                'competences' => array_map(
+                    function ($competence) {
+                        return $competence->getId();
+                    },
+                    $offreStage->getCompetences()->toArray()
+                ),
+                'promotions' => array_map(function ($promotion) {
+                    return $promotion->getId();
+                }, $offreStage->getPromotions()->toArray())
             ];
         }
-        return new JsonResponse($responseData);
+
+        return new JsonResponse($data);
     }
+
     /**
      * @Route ("/offrestage",name="post_offrestage", methods={"POST"} )
      */
@@ -70,7 +113,25 @@ class OffreStageContoller extends AbstractController
         if (isset($data['nb_places_offered'])) {
             $offrestage->setNb_places_offered($data['nb_places_offered']);
         }
+        if (isset($data['competence'])) {
+            $competenceIds = $data['competence'];
+            foreach ($competenceIds as $competenceId) {
+                $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
+                if ($competence) {
+                    $offrestage->addCompetence($competence);
+                }
+            }
+        }
 
+        if (isset($data['promotion'])) {
+            $promotionIds = $data['promotion'];
+            foreach ($promotionIds as $promotionId) {
+                $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
+                if ($promotion) {
+                    $offrestage->addPromotion($promotion);
+                }
+            }
+        }
         $entityManager->persist($offrestage);
         $entityManager->flush();
 
@@ -83,19 +144,55 @@ class OffreStageContoller extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $offrestage->setName($data['name']);
-        $offrestage->setInternship_duration($data['internship_duration']);
-        $offrestage->setCompensation_basis($data['compensation_basis']);
-        $offrestage->setOffer_date(DateTimeImmutable::createFromFormat('Y-m-d', $data['offer_date']));
-        $offrestage->setNb_places_offered($data['nb_places_offered']);
+        if (isset($data['name'])) {
+            $offrestage->setName($data['name']);
+        }
 
-        $competenceIds = $data['competence'];
-        // $promortionIds = $data['promotion'];
+        if (isset($data['internship_duration'])) {
+            $offrestage->setInternship_duration($data['internship_duration']);
+        }
 
-        foreach ($competenceIds as $competenceId) {
-            $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
-            if ($competence) {
-                $offrestage->addCompetence($competence);
+        if (isset($data['compensation_basis'])) {
+            $offrestage->setCompensation_basis($data['compensation_basis']);
+        }
+
+        if (isset($data['offer_date'])) {
+            $offrestage->setOffer_date(DateTimeImmutable::createFromFormat('Y-m-d', $data['offer_date']));
+        }
+
+        if (isset($data['nb_places_offered'])) {
+            $offrestage->setNb_places_offered($data['nb_places_offered']);
+        }
+
+        if (isset($data['competence'])) {
+            // Remove old competences first
+            foreach ($offrestage->getCompetences() as $competence) {
+                $offrestage->removeCompetence($competence);
+            }
+
+            // Add new competences
+            $competenceIds = $data['competence'];
+            foreach ($competenceIds as $competenceId) {
+                $competence = $this->entityManager->getRepository(Competence::class)->find($competenceId);
+                if ($competence) {
+                    $offrestage->addCompetence($competence);
+                }
+            }
+        }
+
+        if (isset($data['promotion'])) {
+            // Remove old promotions first
+            foreach ($offrestage->getPromotions() as $promotion) {
+                $promotion->removeOffreStage($offrestage);
+            }
+
+            // Add new promotions
+            $promotionIds = $data['promotion'];
+            foreach ($promotionIds as $promotionId) {
+                $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
+                if ($promotion) {
+                    $offrestage->addPromotion($promotion);
+                }
             }
         }
 
@@ -104,14 +201,20 @@ class OffreStageContoller extends AbstractController
 
         return new JsonResponse(['message' => 'Data updated successfully'], JsonResponse::HTTP_OK);
     }
+
     /**
      * @Route("/offrestage/{id}", name="app_delete_data", methods={"DELETE"})
      */
     public function deleteData(OffreStage $offrestage, EntityManagerInterface $entityManager): JsonResponse
     {
+
+
+
+
         $entityManager->remove($offrestage);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Data deleted successfully'], JsonResponse::HTTP_OK);
+
+        return new JsonResponse(['message' => 'Les données ont été supprimées avec succès'], JsonResponse::HTTP_OK);
     }
 }
