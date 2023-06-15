@@ -88,6 +88,7 @@ class EntrepriseController extends AbstractController
         $entreprise->setActivity_area($data['activity_area']);
 
         $entreprise->setNb_cesi($data['nb_cesi']);
+
         $localiteIds = $data['localities'] ?? [];
         $localites = [];
 

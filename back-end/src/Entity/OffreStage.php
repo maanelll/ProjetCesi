@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Competence;
+use App\Entity\Promotion;
+
 
 #[ORM\Entity(repositoryClass: OffreStageRepository::class)]
 class OffreStage
@@ -17,29 +20,32 @@ class OffreStage
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $duree_stag = null;
+    private ?int $internship_duration = null;
 
     #[ORM\Column(nullable: true)]
-    private ?float $base_renum = null;
+    private ?float $compensation_basis = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_offre = null;
+    private ?\DateTimeInterface $offer_date = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $nb_places_offert = null;
+    private ?int $nb_places_offered = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "offreStages")]
+    #[ORM\ManyToMany(targetEntity: Competence::class, mappedBy: "offreStages", cascade: ["remove"])]
+    #[ORM\JoinTable(name: "offrestage_competence")]
     private Collection $competences;
 
-    #[ORM\ManyToOne(targetEntity: Promotion::class, inversedBy: 'offreStages')]
-    private ?Promotion $promotion = null;
+    #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: 'offreStages', cascade: ["remove"])]
+    #[ORM\JoinTable(name: "offrestage_promotion")]
+    private Collection $promotions;
 
     public function __construct()
     {
         $this->competences = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
     }
 
     // Getters and setters
@@ -49,50 +55,50 @@ class OffreStage
         return $this->id;
     }
 
-    public function getDureeStag(): ?int
+    public function getInternship_duration(): ?int
     {
-        return $this->duree_stag;
+        return $this->internship_duration;
     }
 
-    public function setDureeStag(int $duree_stag): self
+    public function setInternship_duration(int $internship_duration): self
     {
-        $this->duree_stag = $duree_stag;
+        $this->internship_duration = $internship_duration;
 
         return $this;
     }
 
-    public function getBaseRenum(): ?float
+    public function getCompensation_basis(): ?float
     {
-        return $this->base_renum;
+        return $this->compensation_basis;
     }
 
-    public function setBaseRenum(?float $base_renum): self
+    public function setCompensation_basis(?float $compensation_basis): self
     {
-        $this->base_renum = $base_renum;
+        $this->compensation_basis = $compensation_basis;
 
         return $this;
     }
 
-    public function getDateOffre(): ?\DateTimeInterface
+    public function getOffer_date(): ?\DateTimeInterface
     {
-        return $this->date_offre;
+        return $this->offer_date;
     }
 
-    public function setDateOffre(?\DateTimeInterface $date_offre): self
+    public function setOffer_date(?\DateTimeInterface $offer_date): self
     {
-        $this->date_offre = $date_offre;
+        $this->offer_date = $offer_date;
 
         return $this;
     }
 
-    public function getNbPlacesOffert(): ?int
+    public function getNb_places_offered(): ?int
     {
-        return $this->nb_places_offert;
+        return $this->nb_places_offered;
     }
 
-    public function setNbPlacesOffert(?int $nb_places_offert): self
+    public function setNb_places_offered(?int $nb_places_offered): self
     {
-        $this->nb_places_offert = $nb_places_offert;
+        $this->nb_places_offered = $nb_places_offered;
 
         return $this;
     }
@@ -120,8 +126,8 @@ class OffreStage
     public function addCompetence(Competence $competence): self
     {
         if (!$this->competences->contains($competence)) {
-            $this->competences->add($competence);
-            $competence->addOffreStage($this);
+            $this->competences[] = $competence;
+            $competence->addOffreStage($this); // Also add this offreStage to the competence's collection
         }
 
         return $this;
@@ -136,42 +142,28 @@ class OffreStage
 
         return $this;
     }
-    public function getPromotion(): ?Promotion
+    public function getPromotions(): Collection
     {
-        return $this->promotion;
+        return $this->promotions;
     }
 
-    public function setPromotion(?Promotion $promotion): self
+    public function addPromotion(Promotion $promotion): self
     {
-        $this->promotion = $promotion;
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions[] = $promotion;
+            $promotion->addOffreStage($this); // Also add this offreStage to the promotion's collection
+        }
 
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Promotion>
-    //  */
-    // public function getPromotions(): Collection
-    // {
-    //     return $this->promotions;
-    // }
+    public function removePromotion(Promotion $promotion): self
+    {
+        if ($this->promotions->contains($promotion)) {
+            $this->promotions->removeElement($promotion);
+            $promotion->removeOffreStage($this); // Also remove this offreStage from the promotion's collection
+        }
 
-    // public function addPromotion(Promotion $promotion): self
-    // {
-    //     if (!$this->promotions->contains($promotion)) {
-    //         $this->promotions->add($promotion);
-    //         $promotion->addOffreStage($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removePromotion(Promotion $promotion): self
-    // {
-    //     if ($this->promotions->removeElement($promotion)) {
-    //         $promotion->removeOffreStage($this);
-    //     }
-
-    //     return $this;
-    // }
+        return $this;
+    }
 }
