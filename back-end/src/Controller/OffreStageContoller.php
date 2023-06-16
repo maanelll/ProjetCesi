@@ -12,6 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OffreStageRepository;
 use DateTimeImmutable;
+use App\Entity\Entreprise;
+
 
 
 /**
@@ -44,15 +46,16 @@ class OffreStageContoller extends AbstractController
                 'compensation_basis' => $offreStage->getCompensation_basis(),
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
-                'competences' => array_map(
+                'competence' => array_map(
                     function ($competence) {
                         return $competence->getId();
                     },
                     $offreStage->getCompetences()->toArray()
                 ),
-                'promotions' => array_map(function ($promotion) {
+                'promotion' => array_map(function ($promotion) {
                     return $promotion->getId();
                 }, $offreStage->getPromotions()->toArray())
+
             ];
 
             return new JsonResponse($data);
@@ -70,15 +73,17 @@ class OffreStageContoller extends AbstractController
                 'compensation_basis' => $offreStage->getCompensation_basis(),
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
-                'competences' => array_map(
+                'entreprise_id' => $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getId() : null, // ajout de l'identifiant de l'entreprise
+                'competence' => array_map(
                     function ($competence) {
                         return $competence->getId();
                     },
                     $offreStage->getCompetences()->toArray()
                 ),
-                'promotions' => array_map(function ($promotion) {
+                'promotion' => array_map(function ($promotion) {
                     return $promotion->getId();
                 }, $offreStage->getPromotions()->toArray())
+
             ];
         }
 
@@ -132,6 +137,16 @@ class OffreStageContoller extends AbstractController
                 }
             }
         }
+        if (isset($data['entreprise_id'])) {
+            $entreprise = $this->entityManager->getRepository(Entreprise::class)->find($data['entreprise_id']);
+            if ($entreprise) {
+                $offrestage->setEntreprise($entreprise);
+            } else {
+                // Gérer la situation lorsque l'entreprise n'existe pas
+                // Par exemple, renvoyer une réponse d'erreur ou attribuer une valeur par défaut
+            }
+        }
+
         $entityManager->persist($offrestage);
         $entityManager->flush();
 
@@ -167,7 +182,7 @@ class OffreStageContoller extends AbstractController
         if (isset($data['competence'])) {
             // Remove old competences first
             foreach ($offrestage->getCompetences() as $competence) {
-                $offrestage->removeCompetence($competence);
+                $competence->removeOffreStage($offrestage);
             }
 
             // Add new competences

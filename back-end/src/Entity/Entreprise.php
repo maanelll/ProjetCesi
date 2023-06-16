@@ -21,12 +21,18 @@ class Entreprise
     private ?string $activity_area = null;
     #[ORM\ManyToMany(targetEntity: Localite::class, mappedBy: "entreprises", cascade: ['remove'])]
     private Collection $localites;
+    #[ORM\OneToMany(targetEntity: "App\Entity\OffreStage", mappedBy: "entreprise")]
+    private Collection $offres;
     public function __construct()
     {
         $this->localites = new ArrayCollection();
+        $this->offres = new ArrayCollection();
     }
     #[ORM\Column(nullable: true)]
     private ?int $nb_cesi = null;
+    /**
+     * @return Collection|OffreStage[]
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +81,32 @@ class Entreprise
     public function setNb_cesi(?int $nb_cesi): self
     {
         $this->nb_cesi = $nb_cesi;
+        return $this;
+    }
+    public function getOffres(): Collection
+    {
+        return $this->offres;
+    }
+
+    public function addOffre(OffreStage $offre): self
+    {
+        if (!$this->offres->contains($offre)) {
+            $this->offres[] = $offre;
+            $offre->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffre(OffreStage $offre): self
+    {
+        if ($this->offres->removeElement($offre)) {
+            // set the owning side to null (unless already changed)
+            if ($offre->getEntreprise() === $this) {
+                $offre->setEntreprise(null);
+            }
+        }
+
         return $this;
     }
 }
