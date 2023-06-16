@@ -6,6 +6,8 @@ use App\Repository\PromotionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\OffreStage;
+
 
 #[ORM\Entity(repositoryClass: PromotionRepository::class)]
 class Promotion
@@ -15,20 +17,19 @@ class Promotion
     #[ORM\Column]
     private ?int $id = null;
 
-     #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)]
     private ?string $promo = null;
 
-    #[ORM\OneToMany(mappedBy: 'promotion',targetEntity : User::class)]
-    private Collection $students;
-    
+    #[ORM\ManyToMany(targetEntity: OffreStage::class, inversedBy: "promotions")]
+    private Collection $offreStages;
 
-    #[ORM\ManyToOne(inversedBy:'managedPromotions',targetEntity: User::class)]
-    #[ORM\JoinColumn(name:"pilot_id", referencedColumnName:"id", nullable: true)]
+    #[ORM\ManyToOne(inversedBy: 'managedPromotions', targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "pilot_id", referencedColumnName: "id", nullable: true)]
     private ?User $pilot = null;
 
     public function __construct()
     {
-        $this->students = new ArrayCollection();
+        $this->offreStages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,27 +48,30 @@ class Promotion
         return $this;
     }
 
-    public function getStudents(): Collection
+    /**
+     * @return Collection|OffreStage[]
+     */
+    public function getOffreStages(): Collection
     {
-        return $this->students;
+        return $this->offreStages;
     }
 
-    public function addStudent(User $student): self
+    public function addOffreStage(OffreStage $offreStage): self
     {
-        if (!$this->students->contains($student)) {
-            $this->students[] = $student;
-            $student->setPromotion($this);
+        if (!$this->offreStages->contains($offreStage)) {
+            $this->offreStages[] = $offreStage;
+            $offreStage->addPromotion($this);
         }
+
         return $this;
     }
 
-    public function removeStudent(User $student): self
+    public function removeOffreStage(OffreStage $offreStage): self
     {
-        if ($this->students->removeElement($student)) {
-            if ($student->getPromotion() === $this) {
-                $student->setPromotion(null);
-            }
+        if ($this->offreStages->removeElement($offreStage)) {
+            $offreStage->removePromotion($this);
         }
+
         return $this;
     }
 

@@ -1,14 +1,16 @@
 export interface IEntreprise {
     id: number
-    nom: string
-    secteur_act: string
-    nb_stage_cesi:number
-    localite: ILocalite[]
+    name: string
+    activity_area: string
+    nb_cesi:number
+    localities: ILocalite[]
 }
 
 export interface ILocalite {
     id: number
-    nom:string
+    adress: string
+    code_postal: string
+    city: string
 }
 export interface IUser {
     id: number

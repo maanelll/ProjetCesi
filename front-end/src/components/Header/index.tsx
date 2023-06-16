@@ -8,7 +8,7 @@ const index = () => {
     return (
         <header
       style={{
-        backgroundColor: '#f5f5f5',
+        background: 'linear-gradient(183.6deg, #AFA5D1 0%, #8A4DFF 73.17%)',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         width: '100%',
       }}
@@ -19,7 +19,7 @@ const index = () => {
           alignItems: 'center',
           padding: '10px',
           margin: '0 auto',
-          maxWidth: '1500px',
+          maxWidth: '1450px',
         }}
       >
         <div style={{ borderRight: '1px solid #ccc', paddingRight: '20px' }}>
