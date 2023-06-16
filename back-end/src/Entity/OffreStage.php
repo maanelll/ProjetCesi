@@ -39,8 +39,12 @@ class OffreStage
     private Collection $competences;
 
     #[ORM\ManyToMany(targetEntity: Promotion::class, mappedBy: 'offreStages', cascade: ["remove"])]
-    #[ORM\JoinTable(name: "offrestage_promotion")]
+    #[ORM\JoinTable(name: "promotion_offre_stage")]
     private Collection $promotions;
+
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Entreprise", inversedBy: "offres")]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Entreprise $entreprise;
 
     public function __construct()
     {
@@ -115,13 +119,7 @@ class OffreStage
         return $this;
     }
 
-    /**
-     * @return Collection<int, Competence>
-     */
-    public function getCompetences(): Collection
-    {
-        return $this->competences;
-    }
+
 
     public function addCompetence(Competence $competence): self
     {
@@ -146,6 +144,11 @@ class OffreStage
     {
         return $this->promotions;
     }
+    public function getCompetences(): Collection
+    {
+        return $this->promotions;
+    }
+
 
     public function addPromotion(Promotion $promotion): self
     {
@@ -163,6 +166,17 @@ class OffreStage
             $this->promotions->removeElement($promotion);
             $promotion->removeOffreStage($this); // Also remove this offreStage from the promotion's collection
         }
+
+        return $this;
+    }
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): self
+    {
+        $this->entreprise = $entreprise;
 
         return $this;
     }
