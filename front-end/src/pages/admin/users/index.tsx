@@ -2,18 +2,18 @@ import React from 'react';
 import { Box, Button, Typography, Rating } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import { DataGrid, GridCellParams, GridColDef} from '@mui/x-data-grid';
-import EtudiantsList from "../../../components/admin/EtudiantsList";
+import UsersList from "../../../components/admin/UsersList";
 
-const EtudiantAdmin = () => {
+const User = () => {
       const navigate = useNavigate()
-      const handleClickAddEtudiant = () => {
-      navigate(`/admin/etudiants/create`)
+      const handleClickAddUser = () => {
+      navigate(`/admin/users/create`)
   }
     return (
           <div>
                 <article>
             <header>
-            <h1>Etidiants</h1>
+            <h1>Utilisateurs</h1>
             </header>
                 </article>
         
@@ -21,10 +21,10 @@ const EtudiantAdmin = () => {
         {
           <>
             <Box display="flex" flexDirection="column" sx={{ mb: "60px" }}>
-                <EtudiantsList />
+                <UsersList />
             </Box>
             <Box sx={{ display: "flex", marginTop: "-80px", marginLeft:"50px"}}>
-              <Button type="submit" variant="contained" color="primary" onClick={handleClickAddEtudiant}>
+              <Button type="submit" variant="contained" color="primary" onClick={handleClickAddUser}>
                 <Typography sx={{color:"black",fontFamily:"arial"}} >Ajouter</Typography>
               </Button>
             </Box>
@@ -37,7 +37,7 @@ const EtudiantAdmin = () => {
     );
 };
 
-export default EtudiantAdmin;
+export default User;
 
 
 

@@ -166,6 +166,7 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
                 $data[] = [
+                    'id'=>$user->getId(),
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
                     'promotion' => $promotion,
@@ -177,6 +178,7 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
                 $data[] = [
+                    'id'=>$user->getId(),
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
                     'promotions' => $promotions,

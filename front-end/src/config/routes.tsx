@@ -7,9 +7,9 @@ const Entreprises = lazy(() => import("../pages/admin/entreprises"))
 const CreateEntreprise = lazy(() => import("../pages/admin/entreprises/create"))
 const EditEntreprise = lazy(()=> import("../pages/admin/entreprises/[id]/editEntreprise"))
 const AddOffreStageForm = lazy(() => import("../pages/admin/entreprises/[id]/addOffreStageForm"))
-const Etudiants = lazy(() => import("../pages/admin/etudiants"))
-const  EditEtudiant = lazy(()=> import("../pages/admin/etudiants/[id]/editEtudiant"))
-const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"))
+const Users = lazy(() => import("../pages/admin/users"))
+const  EditUser = lazy(()=> import("../pages/admin/users/[id]/editUser"))
+const CreateUser = lazy(() => import("../pages/admin/users/create"))
 
 
 const AppRoutes = () => {
@@ -40,16 +40,16 @@ const AppRoutes = () => {
             element: <AddOffreStageForm/>
         },
         {
-            path: "/admin/etudiants",
-            element: <Etudiants/>
+            path: "/admin/users",
+            element: <Users/>
         },
            {
-            path: "/admin/etudiants/:etudiantId/edit",
-            element: <EditEtudiant/>
+            path: "/admin/users/:userId/edit",
+            element: <EditUser/>
         },
         {
-            path: "/admin/etudiants/create",
-            element: <CreateEtudiant isEditMode={false}/>
+            path: "/admin/users/create",
+            element: <CreateUser isEditMode={false}/>
         }
         
     ])
