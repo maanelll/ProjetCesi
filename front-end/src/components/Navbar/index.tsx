@@ -75,7 +75,7 @@ const Navbar = () => {
             variant="contained"
             onClick={handleSignOut}
             sx={{
-              marginTop: "10px",
+              marginTop: "12px",
               "&:hover": {
           boxShadow: "3px 3px #Fafad4",
           transition: ".2s",
@@ -86,6 +86,15 @@ const Navbar = () => {
           </Button>
           </Box>
       </Box>
+      <Box
+            sx={{
+              width: "100%",
+              borderBottom: "1px solid #ffffff",
+              marginTop: "10px",
+              marginBottom:"10px"
+            }}
+          />
+      
       <Box>
         {Object.keys(routes).map((key) => {
           const { route, text, subLinks, icon } = routes[key]
@@ -116,6 +125,8 @@ const Navbar = () => {
                     fontWeight: openedLink === route ? 800 : 600,
                     justifyContent: "flex-start",
                     position: "relative",
+                    fontSize: "15px",
+                    fontFamily: "Arial",
                     width: "100%",
                     "&:after":
                       openedLink === route && subLinks
@@ -125,7 +136,7 @@ const Navbar = () => {
                             borderTopColor: "brown.main",
                             content: '" "',
                             display: "block",
-                            left: "20%",
+                            left: "10%",
                             position: "absolute",
                             top: "100%",
                           }
@@ -158,9 +169,9 @@ const Navbar = () => {
                         sx={{
                           backgroundColor: "transparent",
                           display: "flex",
-                          height: "35px",
+                          height: "50px",
                           justifyContent: "flex-start",
-                          pl: "40px",
+                          pl: "25px",
                           width: "100%",
                           "&:hover": { backgroundColor: "transparent" },
                         }}
@@ -168,7 +179,7 @@ const Navbar = () => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontWeight: 500,
+                            fontWeight: 700,
                             "&:hover": { fontWeight: 700 },
                           }}
                         >

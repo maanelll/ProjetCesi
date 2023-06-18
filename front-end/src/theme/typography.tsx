@@ -31,7 +31,7 @@ const typography = {
   },
   body2: {
     fontWeight: 700,
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: "17.07px",
   },
   h1: {

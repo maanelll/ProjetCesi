@@ -1,6 +1,5 @@
 import { useRoutes } from "react-router-dom"
-import { Suspense, lazy, useContext } from "react"
-import AuthContext from "./authContext"
+import { Suspense, lazy} from "react"
 
 const Dashboard = lazy(() => import("../pages/Dashboard"))
 const Login = lazy(()=> import("../pages/Login"))
@@ -15,7 +14,6 @@ const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"))
 
 
 const AppRoutes = () => {
-    const {role} = useContext(AuthContext)
     const element = useRoutes([
         {
         path: "/",
