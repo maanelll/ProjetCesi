@@ -55,8 +55,8 @@ const Navbar = () => {
         >
         <Box
           sx={{
-            width: "70px",
-            height: "70px",
+            width: "80px",
+            height: "80px",
             backgroundImage: `url(${profileImage})`,
             backgroundSize: "cover",
             borderRadius: "50%",
@@ -106,7 +106,7 @@ const Navbar = () => {
                 <Button
                   variant="containedGradientLarge"
                   onClick={() => handleClick(route)}
-                  color="secondary"
+                  color="primary"
                   sx={{
                     alignItems: "center",
                     gap: "10px",

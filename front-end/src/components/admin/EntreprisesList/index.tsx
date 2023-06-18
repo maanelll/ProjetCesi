@@ -6,10 +6,13 @@ import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../types";
 import AuthContext from "../../../config/authContext";
+import { SNACKBAR_MESSAGES } from "../../../config/constants";
+import { useSnackbar } from "../../../context/SnackBarContext";
 
 
 const EntreprisesList: React.FC = () => {
   const navigate = useNavigate();
+  const showSnackbar = useSnackbar();
   const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise[]>([]);
   const [searchValue, setSearchValue] = useState("");
@@ -31,11 +34,12 @@ const EntreprisesList: React.FC = () => {
   
   const handleDeleteEntrepriseClick = (entrepriseId: number) => {
     axios.delete(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
-      .then(()=>
-        window.location.reload()
-      )
-      .catch((error) => {
-      console.error("Error deleting", error)
+      .then(() => {
+        setEntreprise(prevState => prevState.filter(ent => ent.id !== entrepriseId));
+        showSnackbar("success", SNACKBAR_MESSAGES.success.axios.delete);
+      })
+      .catch(() => {
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.delete);
     })
   };
   const handleEditEntrepriseClick = (entrepriseId: number) => {
