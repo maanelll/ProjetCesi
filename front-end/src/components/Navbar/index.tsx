@@ -11,7 +11,10 @@ import AuthContext from "../../config/authContext";
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
-  const { logout } = useContext(AuthContext);
+  const { logout, role } = useContext(AuthContext);
+  // console.log("hedha role: ",role)
+  const isAdmin = role === "ROLE_ADMIN";
+  const isPilot = role === "ROLE_PILOTE";
 
   const handleClick = (link: string) => {
       setOpenedLink(link === openedLink ? "" : link)
@@ -22,6 +25,7 @@ const Navbar = () => {
       navigate(link)
     }
   }
+
   const handleSignOut = () => {
     logout();
   };
@@ -85,6 +89,10 @@ const Navbar = () => {
       <Box>
         {Object.keys(routes).map((key) => {
           const { route, text, subLinks, icon } = routes[key]
+          // Skip rendering the administration route if the user is not an admin
+          if (!isAdmin && !isPilot && key === "admin") {
+            return null;
+          }
           return (
             <Box
               key={key}
