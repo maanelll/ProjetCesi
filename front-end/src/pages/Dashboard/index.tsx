@@ -11,7 +11,8 @@ const Dashboard: React.FC = () => {
         <Box>
       {isAuthenticated ? (
         <div>
-          <div style={{ flexGrow: 1, paddingRight: '50px' }}>
+          <center><h1>Dashboard</h1></center>
+          {/* <div style={{ flexGrow: 1, paddingRight: '50px' }}>
           <TextField
             variant="outlined"
             placeholder="Offre de stage"
@@ -31,7 +32,7 @@ const Dashboard: React.FC = () => {
               ),
             }}
           />
-        </div>
+        </div> */}
         </div>
       ) : (
         <Box >

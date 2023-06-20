@@ -12,7 +12,6 @@ const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
   const { logout, role } = useContext(AuthContext);
-  // console.log("hedha role: ",role)
   const isAdmin = role === "ROLE_ADMIN";
   const isPilot = role === "ROLE_PILOTE";
 
@@ -35,14 +34,15 @@ const Navbar = () => {
         backgroundImage: (theme) => theme.palette.gradient.purple,
         borderRadius: "0px 0px 60px 0px",
         height: "100%",
-        px: "10px",
+        width: "265px",
+
       }}
     >
       <Box
         sx={{
           alignItems: "center",
           display: "flex",
-          height: "175px",
+          height: "225px",
           justifyContent: "center",
         }}
       >
@@ -76,13 +76,15 @@ const Navbar = () => {
             onClick={handleSignOut}
             sx={{
               marginTop: "12px",
+              padding: "10px 25px",
+              
               "&:hover": {
           boxShadow: "3px 3px #Fafad4",
           transition: ".2s",
         },
             }}
           >
-            <Typography sx={{color:"black",fontFamily:"arial"}}>deconnexion</Typography>
+            <Typography sx={{color:"black",fontFamily:"arial",fontSize: "14px"}}>deconnexion</Typography>
           </Button>
           </Box>
       </Box>
@@ -90,8 +92,8 @@ const Navbar = () => {
             sx={{
               width: "100%",
               borderBottom: "1px solid #ffffff",
-              marginTop: "10px",
-              marginBottom:"10px"
+              marginTop: "5px",
+              marginBottom:"15px"
             }}
           />
       
@@ -101,7 +103,7 @@ const Navbar = () => {
           // Skip rendering the administration route if the user is not an admin
           if (!isAdmin && !isPilot && key === "admin") {
             return null;
-          }
+          } 
           return (
             <Box
               key={key}
@@ -111,21 +113,21 @@ const Navbar = () => {
                 },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center " }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Button
                   variant="containedGradientLarge"
                   onClick={() => handleClick(route)}
                   color="primary"
                   sx={{
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "5px",
                     backgroundColor:
                       openedLink === route ? "brown.main" : "transparent",
                     display: "flex",
-                    fontWeight: openedLink === route ? 800 : 600,
+                    fontWeight: openedLink === route ? 750 : 600,
                     justifyContent: "flex-start",
                     position: "relative",
-                    fontSize: "15px",
+                    fontSize: "17px",
                     fontFamily: "Arial",
                     width: "100%",
                     "&:after":
@@ -136,7 +138,7 @@ const Navbar = () => {
                             borderTopColor: "brown.main",
                             content: '" "',
                             display: "block",
-                            left: "10%",
+                            left: "12%",
                             position: "absolute",
                             top: "100%",
                           }
@@ -171,7 +173,7 @@ const Navbar = () => {
                           display: "flex",
                           height: "50px",
                           justifyContent: "flex-start",
-                          pl: "25px",
+                          pl: "40px",
                           width: "100%",
                           "&:hover": { backgroundColor: "transparent" },
                         }}
@@ -179,7 +181,8 @@ const Navbar = () => {
                         <Typography
                           variant="body2"
                           sx={{
-                            fontWeight: 700,
+                            fontWeight: 500,
+                            fontSize:"16px",
                             "&:hover": { fontWeight: 700 },
                           }}
                         >
