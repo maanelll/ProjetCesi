@@ -2,9 +2,10 @@ import { useState, FormEvent, useContext, useEffect } from 'react';
 import './loginStyle.css';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import AuthContext from '../../config/authContext';
-import { CircularProgress } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import logoCesi from '../../assets/img/Logo_cesi.png'
+import logoAttineos from '../../assets/img/Logo_attineos.jpg'
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -39,6 +40,18 @@ function Login() {
   return (
     
     <div className="login-wrapper">
+      <div className="logo-container">
+        <img
+          src={logoCesi}
+          alt="Logo CESI"
+          className="logo1"
+        />
+        <img
+          src={logoAttineos}
+          alt="Logo ATTINEOS"
+          className="logo2"
+        />
+      </div>
       <div className="login-box">
         <div className="login-header">
           <h2>Login</h2>
@@ -72,11 +85,23 @@ function Login() {
             </div>
           </div>
           {errorMessage && <p>{errorMessage}</p>}
-           <button type="submit" className="login-btn" disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} /> : 'Se connecter'}
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              padding: "20px",
+              width: "100%",
+              backgroundColor:"#8A4DFF",
+              marginTop: "12px",
+              borderRadius: "5%",
+              cursor: "pointer",
+              boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)", // Box shadow
+              position: "relative",
+            }}
+          >
+            {isLoading ? <CircularProgress size={24} /> : 
+            <Typography sx={{color:"white",fontFamily:"Segoe UI",fontSize:"22px"}}>Se connecter</Typography>}
           </button>
-          <div className="signup-link">
-          </div>
         </form>
       </div>
     </div>
