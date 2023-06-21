@@ -8,7 +8,7 @@ import { IEntreprise, ILocalite } from "../../../types";
 import AuthContext from "../../../config/authContext";
 import { SNACKBAR_MESSAGES } from "../../../config/constants";
 import { useSnackbar } from "../../../context/SnackBarContext";
-
+import { styled } from "@mui/system";
 
 const EntreprisesList: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +21,11 @@ const EntreprisesList: React.FC = () => {
       Authorization: `Bearer ${token}` 
     }
   };
+  const StyledHeaderCell = styled("div")`
+  font-size: 16px; 
+  font-weight: bold;
+  text-align: "center";
+`;
 
   useEffect(() => {
   axios.get(`http://localhost:8000/api/entreprise`,config)
@@ -64,15 +69,16 @@ const EntreprisesList: React.FC = () => {
     }).join(", ");
   };
 const columns: GridColDef[] = [
-  { field: "name", headerName: "Nom", width: 100 },
+  { field: "name", headerName: "Nom", width: 100, renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>},
   {
       field: "localities",
       headerName: "Localités",
-      width: 300,
+      width: 200,
       renderCell: (params) => <Typography>{formatLocalites(params.row.localities)}</Typography>,
+      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
     },
-  { field: "activity_area", headerName: "Secteur d'activité", width: 200 },
-  { field: "nb_cesi", headerName: "Nombre de Stagiaire", width: 150 },
+  { field: "activity_area", headerName: "Secteur d'activité", width: 200, renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
+  { field: "nb_cesi", headerName: "Nb de Stagiaire", width: 150,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
   {
     field: "eval_stag",
     headerName: "Evaluation des stagiaires",
@@ -80,11 +86,12 @@ const columns: GridColDef[] = [
     renderCell: (params) => (
       <Rating name={`rating-${params.row.id}`} value={params.value} readOnly  />
       ),
+    renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
     },
     {
       field: "conf_pilote",
       headerName: "Confiance de pilote de promo",
-      width: 200,
+      width: 215,
       renderCell: (params) => (
         <Rating
           name={`rating-${params.row.id}`}
@@ -92,11 +99,12 @@ const columns: GridColDef[] = [
           readOnly
         />
       ),
+      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
   },
   {
     field: "actions",
     headerName: "Actions",
-    width: 300,
+    width: 200,
     renderCell: (params: GridCellParams) => {
       const handleButtonClick = (entrepriseId:number) => {
         navigate(`/admin/entreprises/${entrepriseId}/addOffreStageForm`)
@@ -116,11 +124,12 @@ const columns: GridColDef[] = [
         </>
       );
     },
+    renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
   },
 ];
     return (
         <>
-      <Box sx={{ p: 3 , marginLeft: "10px" }}>
+      <Box sx={{ p: 2 , marginLeft: "10px" }}>
         <Typography variant="h5" sx={{ mb: 3 }}>
           Liste des entreprises
         </Typography>

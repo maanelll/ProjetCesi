@@ -120,7 +120,7 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     nb_cesi: entreprise.nb_cesi,
     localities: localiteIds
   };
-
+  
   if (isEditMode) {
     // Edit mode: Update existing entreprise
     axios.put(`http://localhost:8000/api/entreprise/${entreprise.id}`, entrepriseData, config)

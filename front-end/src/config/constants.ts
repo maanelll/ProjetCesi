@@ -1,7 +1,7 @@
 import Home from "../components/icons/Home"
 import AdminIcon from "../components/icons/Admin"
-
-
+import Loupe from "../components/icons/Loupe"
+import WishList from "../components/icons/WishList"
 
 type RouteType = {
   [key: string]: {
@@ -20,6 +20,16 @@ export const routes: RouteType = {
         icon: Home,
         route: "/",
         text: "Tableau de bord",
+  },
+  offreStage: {
+        icon: Loupe,
+        route: "/internships",
+        text: "Rechercher des offres",
+  },
+  wishList: {
+        icon: WishList,
+        route: "/wishList",
+        text: "Liste de souhait",
   },
   admin: {
         icon: AdminIcon,

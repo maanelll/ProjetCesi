@@ -1,6 +1,6 @@
-import { useRoutes } from "react-router-dom";
 import { Suspense, lazy, useContext } from "react";
 import AuthContext from "./authContext";
+import { useRoutes } from "react-router-dom";
 
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Login = lazy(() => import("../pages/Login"));
@@ -19,6 +19,9 @@ const EditEtudiant = lazy(
   () => import("../pages/admin/etudiants/[id]/editEtudiant")
 );
 const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"));
+const Internship = lazy(() => import("../pages/Internship"));
+const WishList = lazy(() => import("../pages/WishList"));
+
 const OffreStages = lazy(() => import("../pages/admin/offreStages"));
 
 const AppRoutes = () => {
@@ -27,6 +30,14 @@ const AppRoutes = () => {
     {
       path: "/",
       element: <Dashboard />,
+    },
+    {
+      path: "/internships",
+      element: <Internship />,
+    },
+    {
+      path: "/wishList",
+      element: <WishList />,
     },
     {
       path: "signIn",
