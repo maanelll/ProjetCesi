@@ -10,7 +10,8 @@ const AddOffreStageForm = lazy(() => import("../pages/admin/entreprises/[id]/add
 const Etudiants = lazy(() => import("../pages/admin/etudiants"))
 const  EditEtudiant = lazy(()=> import("../pages/admin/etudiants/[id]/editEtudiant"))
 const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"))
-
+const Internship = lazy(() => import("../pages/Internship"))
+const WishList = lazy(()=> import("../pages/WishList"))
 
 
 const AppRoutes = () => {
@@ -18,6 +19,14 @@ const AppRoutes = () => {
         {
         path: "/",
         element: <Dashboard />,
+        },
+        {
+            path :"/internships",
+        element: <Internship/>
+        },
+        {
+            path :"/wishList",
+        element: <WishList/>
         },
         {
             path :"signIn",
