@@ -22,22 +22,38 @@ class CompetenceController extends AbstractController
         $this->entityManager = $entityManager;
     }
     /**
-     * @Route("/competence", name="get_competence", methods={"GET"})
+     * @Route("/competence/{id?}", name="get_competence", methods={"GET"})
      */
-    public function getCompetence(CompetenceRepository $repository): JsonResponse
-    { {
-            $competence = $repository->findAll();
+    public function getCompetence(int $id = null, CompetenceRepository $repository): JsonResponse
+    {
+        if ($id) {
+            // Fetch specific competence by ID
+            $competence = $repository->find($id);
+
+            if (!$competence) {
+                throw $this->createNotFoundException(
+                    'No competence found for id ' . $id
+                );
+            }
+
+            $data = [
+                'id' => $competence->getId(),
+                'comp' => $competence->getComp(),
+            ];
+        } else {
+            // Fetch all competences
+            $competences = $repository->findAll();
 
             $data = [];
-            foreach ($competence as $competence) {
+            foreach ($competences as $competence) {
                 $data[] = [
                     'id' => $competence->getId(),
                     'comp' => $competence->getComp(),
                 ];
             }
-
-            return new JsonResponse($data);
         }
+
+        return new JsonResponse($data);
     }
 
     /**
@@ -52,7 +68,8 @@ class CompetenceController extends AbstractController
 
         $entityManager->persist($competence);
         $entityManager->flush();
-        return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
+        $newId = $competence->getId();
+        return new JsonResponse(['message' => 'Data created successfully', 'id' => $newId], JsonResponse::HTTP_CREATED);
     }
 
     /**
