@@ -33,7 +33,12 @@ export const routes: RouteType = {
           {
             route: "/admin/etudiants",
             text: "Gestion des etudiants"
+          },
+          {
+            route: "/admin/offreStages",
+            text: "Gestion offres de stages"
           }
+
         ]
 
     }

@@ -46,6 +46,10 @@ class OffreStage
     #[ORM\JoinColumn(nullable: false)]
     private ?Entreprise $entreprise;
 
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Localite", inversedBy: "offersL")]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?localite $localite;
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();
@@ -146,7 +150,7 @@ class OffreStage
     }
     public function getCompetences(): Collection
     {
-        return $this->promotions;
+        return $this->competences;
     }
 
 
@@ -177,6 +181,17 @@ class OffreStage
     public function setEntreprise(?Entreprise $entreprise): self
     {
         $this->entreprise = $entreprise;
+
+        return $this;
+    }
+    public function getLocalite(): ?Localite
+    {
+        return $this->localite;
+    }
+
+    public function setLocalite(?Localite $localite): self
+    {
+        $this->localite = $localite;
 
         return $this;
     }
