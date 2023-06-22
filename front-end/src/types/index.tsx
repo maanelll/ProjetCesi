@@ -18,14 +18,17 @@ export interface IUser {
     lastName:string
     email: string
     password:string
-    role: string
+    role: IRole
     promotions: IPromotion[]
-    center:string
-    promotion:string
+    center:ICenter
+}
+export interface IRole {
+  id: number;
+  role: string;
 }
 export interface ICenter {
     id: number
-    centerName:string
+    center:string
 }
 export interface IPromotion {
     id: number

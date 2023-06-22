@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import AuthContext from "../../../../config/authContext";
-import { IUser, IPromotion } from "../../../../types";
+import { IUser, IPromotion, ICenter, IRole } from "../../../../types";
 
 interface CreateUserProps {
   isEditMode: boolean;
@@ -14,16 +14,17 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
-  const [roles, setRoles] = useState<string[]>([]);
-  const [centers, setCenters] = useState<string[]>([]);
+  const [roles, setRoles] = useState<IRole[]>([]);
+  const [centers, setCenters] = useState<ICenter[]>([]);
   const [promotions, setPromotions] = useState<IPromotion[]>([]);
-  const [roleId, setRoleId] = useState<number>(0);
+  const [roleId, setRoleId] = useState<number | null>(null);
   const [selectedPromotions, setSelectedPromotions] = useState<number[]>([]);
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [centerId, setCenterId] = useState<number>(0);
+  const [centerId, setCenterId] = useState<number | null>(null);
+  const [pilotPromotions, setPilotPromotions] = useState<string[]>([]);
 
   useEffect(() => {
     const config = {
@@ -34,8 +35,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
 
     axios.get('https://localhost:8000/api/roles', config)
       .then(response => {
-        const roleNames = response.data.map((role: { id: number, role: string }) => role.role);
-        setRoles(roleNames);
+        setRoles(response.data);
       })
       .catch(error => {
         console.error("Error fetching roles:", error);
@@ -43,8 +43,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
 
     axios.get('https://localhost:8000/api/centers', config)
       .then(response => {
-        const centerNames = response.data.map((center: { id: number, center: string }) => center.center);
-        setCenters(centerNames);
+        setCenters(response.data);
       })
       .catch(error => {
         console.error("Error fetching centers:", error);
@@ -57,7 +56,39 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
       .catch(error => {
         console.error("Error fetching promotions:", error);
       });
-  }, [token]);
+
+    if (isEditMode && existingUser) {
+      console.log(existingUser.role.id); // log the role id
+    console.log(existingUser.center.id); 
+      setRoleId(existingUser.role.id);
+      setEmail(existingUser.email);
+      setFirstName(existingUser.firstName);
+      setLastName(existingUser.lastName);
+      setPassword(existingUser.password);
+      setCenterId(existingUser.center.id);
+
+      if (Array.isArray(existingUser.promotions)) {
+        setSelectedPromotions((existingUser.promotions as IPromotion[]).map(promotion => promotion.id));
+      } else if (existingUser.promotions && typeof existingUser.promotions === 'object') {
+        setSelectedPromotions([(existingUser.promotions as IPromotion).id]);
+      }
+    }
+     // Fetch pilot promotions if the selected role is "pilot"
+  if (roleId === 2) {
+    axios.get('https://localhost:8000/api/pilot_promotions', config)
+      .then(response => {
+        setPilotPromotions(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching pilot promotions:", error);
+      });
+  }
+  }, [token, isEditMode, existingUser]);
+
+  const displayedPromotions =
+  roleId === 2
+    ? promotions.filter((promotion: IPromotion) => !pilotPromotions.includes(promotion.promo))
+    : promotions;
 
   const handleRoleChange = (event: SelectChangeEvent<number>) => {
     const roleId = event.target.value as number;
@@ -70,25 +101,41 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
     setSelectedPromotions(selectedPromotions);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const userData = {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      password: password,
-      roleId: roleId,
-      promotionIds: selectedPromotions,
-      centerId: centerId,
-    };
+  if (roleId === null || centerId === null) {
+    console.error("Role and center must be selected.");
+    return;
+  }
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
+  const userData = {
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+    password: password,
+    roleId: roleId,
+    promotionIds: selectedPromotions,
+    centerId: centerId,
+  };
 
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+
+  if (isEditMode && existingUser) {
+    // update the existing user with a PUT request
+    axios.put(`https://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
+      .then(() => {
+        navigate("/admin/users");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    // create a new user with a POST request
     axios.post("https://localhost:8000/api/create_user", userData, config)
       .then(() => {
         navigate("/admin/users");
@@ -96,14 +143,11 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
       .catch((error) => {
         console.error(error);
       });
-  };
+  }
+};
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Formulaire de création d'un utilisateur
-      </Typography>
-
       <form onSubmit={handleSubmit}>
         <TextField
           name="firstName"
@@ -148,13 +192,13 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
           <Select
             labelId="role-select-label"
             id="role-select"
-            value={roleId}
+            value={roleId || ""}
             label="Rôle"
             onChange={handleRoleChange}
           >
-            {roles.map((role, index) => (
-              <MenuItem key={index + 1} value={index + 1}>
-                {role}
+            {roles.map((role: IRole) => (
+              <MenuItem key={role.id} value={role.id}>
+                {role.role}
               </MenuItem>
             ))}
           </Select>
@@ -164,13 +208,13 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
           <InputLabel id="center-label">Centre</InputLabel>
           <Select
             labelId="center-label"
-            value={centerId}
+            value={centerId || ""}
             onChange={(e) => setCenterId(e.target.value as number)}
             label="Centre"
             name="center"
           >
-            {centers.map((center, index) => (
-              <MenuItem key={index + 1} value={index + 1}>{center}</MenuItem>
+            {centers.map((center: ICenter) => (
+              <MenuItem key={center.id} value={center.id}>{center.center}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -186,7 +230,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
               label="Promotions"
               name="promotion"
             >
-              {promotions.map((promotion) => (
+              {displayedPromotions.map((promotion: IPromotion) => (
                 <MenuItem key={promotion.id} value={promotion.id}>
                   {promotion.promo}
                 </MenuItem>

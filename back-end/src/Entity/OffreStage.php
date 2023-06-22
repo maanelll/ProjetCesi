@@ -46,6 +46,7 @@ class OffreStage
     {
         $this->competences = new ArrayCollection();
         $this->promotions = new ArrayCollection();
+        $this->wishLists = new ArrayCollection();
     }
 
     // Getters and setters
@@ -162,6 +163,40 @@ class OffreStage
         if ($this->promotions->contains($promotion)) {
             $this->promotions->removeElement($promotion);
             $promotion->removeOffreStage($this); // Also remove this offreStage from the promotion's collection
+        }
+
+        return $this;
+    }
+    /**
+     * @ORM\OneToMany(targetEntity=WishList::class, mappedBy="offreStage", orphanRemoval=true)
+     */
+    private $wishLists;
+
+    /**
+     * @return Collection|WishList[]
+     */
+    public function getWishLists(): Collection
+    {
+        return $this->wishLists;
+    }
+
+    public function addWishList(WishList $wishList): self
+    {
+        if (!$this->wishLists->contains($wishList)) {
+            $this->wishLists[] = $wishList;
+            $wishList->setOffreStage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWishList(WishList $wishList): self
+    {
+        if ($this->wishLists->removeElement($wishList)) {
+            // set the owning side to null (unless already changed)
+            if ($wishList->getOffreStage() === $this) {
+                $wishList->setOffreStage(null);
+            }
         }
 
         return $this;

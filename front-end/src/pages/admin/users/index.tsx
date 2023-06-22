@@ -1,43 +1,36 @@
 import React from 'react';
-import { Box, Button, Typography, Rating } from "@mui/material"
-import { useNavigate } from "react-router-dom"
-import { DataGrid, GridCellParams, GridColDef} from '@mui/x-data-grid';
+import { Box, Button, Typography, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import UsersList from "../../../components/admin/UsersList";
 
 const User = () => {
-      const navigate = useNavigate()
-      const handleClickAddUser = () => {
-      navigate(`/admin/users/create`)
-  }
-    return (
-          <div>
-                <article>
-            <header>
-            <h1>Utilisateurs</h1>
-            </header>
-                </article>
-        
-            <section>
-        {
-          <>
-            <Box display="flex" flexDirection="column" sx={{ mb: "60px" }}>
-                <UsersList />
-            </Box>
-            <Box sx={{ display: "flex", marginTop: "-80px", marginLeft:"50px"}}>
-              <Button type="submit" variant="contained" color="primary" onClick={handleClickAddUser}>
-                <Typography sx={{color:"black",fontFamily:"arial"}} >Ajouter</Typography>
-              </Button>
-            </Box>
-          </>
-        }
-      </section>
-      
+  const navigate = useNavigate();
 
-        </div>
-    );
+  const handleClickAddUser = () => {
+    navigate(`/admin/users/create`);
+  };
+
+  return (
+    <div>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: "1rem" }}>
+        <Box>
+          <Button variant="contained" color="primary" onClick={handleClickAddUser}>
+            Ajouter un utilisateur
+          </Button>
+        </Box>
+        <Box sx={{ marginLeft: "auto", marginRight: "2rem" }}>
+          <TextField label="Rechercher" variant="outlined" size="small" sx={{ width: 250 }} />
+        </Box>
+      </Box>
+      <Box sx={{ marginBottom: "2rem" }}>
+        <UsersList />
+      </Box>
+    </div>
+  );
 };
 
 export default User;
+
 
 
 

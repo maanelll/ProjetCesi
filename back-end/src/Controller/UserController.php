@@ -18,6 +18,81 @@ use App\Entity\Role;
  */
 class UserController extends AbstractController
 {
+
+/**
+ * @Route("/api/pilot_promotions", name="pilot_promotions", methods={"GET"})
+ */
+public function getPilotPromotions(EntityManagerInterface $entityManager): Response
+{
+    $pilotPromotions = [];
+
+    // Récupérer tous les utilisateurs ayant un rôle avec l'ID 2 (pilotes)
+    $users = $entityManager->getRepository(User::class)->findBy(['role' => 2]);
+
+    // Parcourir chaque utilisateur (pilote)
+    foreach ($users as $user) {
+        // Récupérer les promotions attribuées à l'utilisateur (pilote)
+        $promotions = $user->getPromotions();
+
+        // Parcourir chaque promotion et ajouter à la liste des promotions attribuées aux pilotes
+        foreach ($promotions as $promotion) {
+            $pilotPromotions[] = $promotion;
+        }
+    }
+
+    // Retourner les promotions sous forme de réponse JSON
+    return $this->json($pilotPromotions);
+}
+
+/**
+ * @Route("/user/{id}", name="get_user_by_id", methods={"GET"})
+ */
+public function getUserById(User $user): Response
+{
+    $role = $user->getRole();
+    $roleData = [
+        'id' => $role->getId(),
+        'name' => $role->getName(),
+    ];
+
+    $center = $user->getCenter();
+    $centerData = $center ? ['id' => $center->getId(), 'centerName' => $center->getCenterName()] : null;
+
+    if ($role->getName() === 'ROLE_ETUDIANT') {
+        $promotion = $user->getPromotion();
+        $promotionData = $promotion ? ['id' => $promotion->getId(), 'promo' => $promotion->getPromo()] : null;
+
+        $data = [
+            'id'=>$user->getId(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email'=>$user->getEmail(),
+            'password'=>$user->getPassword(),
+            'promotions' => $promotionData,
+            'center' => $centerData,
+            'role' => $roleData,
+        ];
+    } else if ($role->getName() === 'ROLE_PILOTE') {
+        $promotions = $user->getManagedPromotions()->map(function($promotion) {
+            return ['id' => $promotion->getId(), 'promo' => $promotion->getPromo()];
+        })->toArray();
+
+        $data = [
+            'id'=>$user->getId(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email'=>$user->getEmail(),
+            'password'=>$user->getPassword(),
+            'promotions' => $promotions,
+            'center' => $centerData,
+            'role' => $roleData,
+        ];
+    }
+
+    return $this->json($data);
+}
+
+
 /**
  * @Route("/create_user", name="create_user", methods={"POST"})
  */
@@ -161,7 +236,7 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
         foreach ($users as $user) {
             $role = $user->getRole()->getName();
 
-            if ($role === 'ROLE_STUDENT') {
+            if ($role === 'ROLE_ETUDIANT') {
                 $promotion = $user->getPromotion() ? $user->getPromotion()->getPromo() : null;
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
@@ -169,11 +244,11 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
                     'id'=>$user->getId(),
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
-                    'promotion' => $promotion,
+                    'promotions' => $promotion,
                     'center' => $center,
                     'role' => $role,
                 ];
-            } else if ($role === 'ROLE_PILOT') {
+            } else if ($role === 'ROLE_PILOTE') {
                 $promotions = $user->getManagedPromotions()->map(fn($promotion) => $promotion->getPromo())->toArray();
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
@@ -190,5 +265,30 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
 
         return $this->json($data);
     }
+
+    /**
+ * @Route("/loggedUser", name="api_user_me", methods={"GET"})
+ */
+public function me(): Response
+{
+    // Récupère l'utilisateur actuellement connecté
+    $user = $this->getUser();
+
+    // Si aucun utilisateur n'est connecté, renvoie une erreur
+    if (!$user) {
+        return $this->json([
+            'message' => 'aucun utilisateur connecté'
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    // Renvoie les informations de l'utilisateur en format JSON
+    return $this->json([
+        'id' => $user->getId(),
+        'firstName' => $user->getFirstName(),
+        'lastName' => $user->getLastName(),
+      
+    ]);
+}
+
 }
 

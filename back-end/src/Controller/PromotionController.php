@@ -25,6 +25,30 @@ class PromotionController extends AbstractController
         $this->entityManager = $entityManager;
         $this->offreStageRepository = $offreStageRepository;
     }
+    /**
+ * @Route("/promotions/{roleId?}", name="get_promotions", methods={"GET"})
+ */
+public function getPromotions($roleId = null): Response
+{
+    $promotions = $this->getDoctrine()->getRepository(Promotion::class)->findAll();
+    
+    if ($roleId === '2') {
+        $pilotPromotions = $this->getDoctrine()->getRepository(User::class)->findPilotPromotions();
+        $promotions = array_filter($promotions, function($promotion) use ($pilotPromotions) {
+            return !in_array($promotion, $pilotPromotions);
+        });
+    }
+
+    $data = array_map(function($promotion) {
+        return [
+            'id' => $promotion->getId(),
+            'promo' => $promotion->getPromo(),
+        ];
+    }, $promotions);
+
+    return $this->json($data);
+}
+
 
     /**
      * @Route("/promotion", name="get_promotion", methods={"GET"})

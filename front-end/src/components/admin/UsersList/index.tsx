@@ -1,94 +1,146 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-import { IUser} from "../../../types";
+import { IUser, IPromotion } from "../../../types";
 import AuthContext from "../../../config/authContext";
-
+import { EditOutlined as EditIcon, DeleteOutline as DeleteIcon } from "@mui/icons-material";
 
 const UsersList: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
-  const [user, setUser] = useState<IUser[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
+  
   const config = {
     headers: {
-      Authorization: `Bearer ${token}` 
+      Authorization: `Bearer ${token}`
     }
   };
+  
   const handleDeleteUserClick = (userId: number) => {
     axios.delete(`https://localhost:8000/api/delete_user/${userId}`, config)
-      .then(()=>
-        window.location.reload()
-      )
+      .then(() => {
+        // Refresh the users list after deletion
+        fetchUsers();
+      })
       .catch((error) => {
-      console.error("Error deleting", error)
-    })
+        console.error("Error deleting", error);
+      });
   };
+  
   const handleEditUserClick = (userId: number) => {
-    navigate(`/admin/users/${userId}/edit`)
+    navigate(`/admin/users/${userId}/edit`);
   };
-  useEffect(() => {
-  axios.get(`https://localhost:8000/api/users`,config)
-    .then(response => {
-      setUser(response.data);
-    })
-    .catch(error => {
-      console.error("Error fetching data:", error);
-    });
-  }, []);
+  
+ const fetchUsers = () => {
+    axios.get(`https://localhost:8000/api/users`, config)
+        .then((response) => {
+            const users = response.data.map((user: any) => {
+                // Si promotions est une chaîne, convertissez-la en un tableau contenant un objet IPromotion
+                if (typeof user.promotions === 'string') {
+                    return {
+                        ...user,
+                        promotions: [{
+                            id: 1,  // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
+                            promo: user.promotions,
+                        }],
+                    };
+                }
+                // Si promotions est un tableau de chaînes, convertissez chaque chaîne en un objet IPromotion
+                else if (Array.isArray(user.promotions)) {
+                    return {
+                        ...user,
+                        promotions: user.promotions.map((promo: string, index: number) => ({
+                            id: index + 1,  // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
+                            promo,
+                        })),
+                    };
+                }
+                return user;
+            });
+            setUsers(users);
+        })
+        .catch((error) => {
+            console.error("Error fetching data:", error);
+        });
+};
 
-const columns: GridColDef[] = [
-  { field: "firstName", headerName: "Nom", width: 100 },
-  { field: "lastName", headerName: "Prénom", width: 200 },
-  { field: "role", headerName: "Rôle", width: 150 },
-  { field: "center", headerName: "Centre", width: 150 },
-  { 
-    field: "promotions", 
-    headerName: "Promotions", 
-    width: 150,
-    renderCell: (params: GridCellParams) => {
-      const user = params.row as IUser;
-      
-      if (user.role === "ROLE_STUDENT" && user.promotion) {
-        return <span>{user.promotion}</span>
-      } else if (user.role === "ROLE_PILOT" && user.promotions) {
-        return <span>{user.promotions.join(', ')}</span> 
+  
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+  
+  const columns: GridColDef[] = [
+    { field: "firstName", headerName: "Nom", width: 150 },
+    { field: "lastName", headerName: "Prénom", width: 150 },
+    { field: "role", headerName: "Rôle", width: 150 },
+    { field: "center", headerName: "Centre", width: 150 },
+    {
+      field: "promotions",
+      headerName: "Promotions",
+      width: 200,
+      renderCell: (params: GridCellParams) => {
+        const user = params.row as IUser;
+        if (Array.isArray(user.promotions)) {
+          return (
+           <ul style={{ listStyleType: "none" }}>
+    {(user.promotions as IPromotion[]).map((promotion) => (
+        <li key={promotion.id}>{promotion.promo}</li>
+    ))}
+</ul>
+          );
+        } else if (typeof user.promotions === "string") {
+          return <span>{user.promotions}</span>;
+        }
+        return null;
       }
-      return null;
-    }  
-  },
- 
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 300,
-    renderCell: (params: GridCellParams) => {
-      return (
-        <>
-          <Button variant="contained" onClick={() => handleDeleteUserClick(params.row.id)}>
-          delete
-        </Button>
-        <Button variant="contained" onClick={() => handleEditUserClick(params.row.id)}>
-          edit
-        </Button>
-        </>
-      );
     },
-  },
-];
-    return (
-        <>
-      <Box sx={{ p: 3 , marginLeft: "20px" }}>
-        <Typography variant="h5" sx={{ mb: 3 }}>
-          Liste des utilisateurs
-        </Typography>
-        <div style={{ height: 300, width: "100%" }}>
-          <DataGrid<IUser> rows={user} columns={columns} autoPageSize getRowId={(row) => row.id} />
-        </div>
-      </Box>
-    </>
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params: GridCellParams) => {
+        const userId = params.row.id as number;
+        return (
+          <>
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => handleEditUserClick(userId)}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              size="small"
+              color="secondary"
+              onClick={() => handleDeleteUserClick(userId)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </>
+        );
+      }
+    }
+  ];
+  
+  return (
+    <Box sx={{ p: 3, marginLeft: "20px", width: "100%" }}>
+      <Typography variant="h5" sx={{ mb: 3, fontSize: "1.5rem" }}>
+        Liste des utilisateurs
+      </Typography>
+      <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
+        <DataGrid
+          rows={users}
+          columns={columns}
+          autoPageSize
+          getRowId={(row) => row.id}
+        />
+      </div>
+    </Box>
   );
 };
 
 export default UsersList;
+
+
