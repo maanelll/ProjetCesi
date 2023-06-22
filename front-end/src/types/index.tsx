@@ -39,6 +39,7 @@ export interface IOffrestage {
   localite: string;
 }
 export interface ICompetence {
+  [x: string]: any;
   id: number;
   comp: string;
 }
