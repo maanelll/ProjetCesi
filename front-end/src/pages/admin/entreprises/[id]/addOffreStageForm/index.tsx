@@ -20,21 +20,42 @@ import {
   IOffrestage,
   IPromotion,
 } from "../../../../../types";
+import { SNACKBAR_MESSAGES } from "../../../../../config/constants";
 import axios from "axios";
 import AuthContext from "../../../../../config/authContext";
+import { useSnackbar } from "@mui/base";
+interface addOffreStageFormPropos {
+  isEditMode: boolean;
+  existingOffrestage?: IOffrestage | null;
+}
 
-const AddOffreStageForm = () => {
+const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
+  isEditMode,
+  existingOffrestage,
+}) => {
+  const showSnackbar = useSnackbar();
+
   const [offre, setOffre] = useState<IOffrestage>({
-    id: 0,
-    name: "",
-    internship_duration: 0,
-    compensation_basis: 0,
-    offer_date: new Date(),
-    nb_places_offered: 0,
-    promotion: [],
-    competence: [],
-    entreprise_name: "",
-    localite: "",
+    id: isEditMode ? existingOffrestage?.id || 0 : 0,
+    name: isEditMode ? existingOffrestage?.name || "" : "",
+    internship_duration: isEditMode
+      ? existingOffrestage?.internship_duration || 0
+      : 0,
+    compensation_basis: isEditMode
+      ? existingOffrestage?.compensation_basis || 0
+      : 0,
+    offer_date: isEditMode
+      ? existingOffrestage?.offer_date || new Date()
+      : new Date(),
+    nb_places_offered: isEditMode
+      ? existingOffrestage?.nb_places_offered || 0
+      : 0,
+    promotion: isEditMode ? existingOffrestage?.promotion || [] : [],
+    competence: isEditMode ? existingOffrestage?.competence || [] : [],
+    entreprise_name: isEditMode
+      ? existingOffrestage?.entreprise_name || ""
+      : "",
+    localite: isEditMode ? existingOffrestage?.localite || "" : "",
   });
 
   const [localites, setLocalites] = useState<ILocalite[]>([]);
@@ -175,16 +196,32 @@ const AddOffreStageForm = () => {
       competence: competenceIds,
       entreprise_id: parseInt(entrepriseId),
     };
-
-    axios
-      .post("http://localhost:8000/api/offrestage", offreStage, config)
-      .then((response) => {
-        console.log(response);
-        navigate("/admin/offres-stage");
-      })
-      .catch((error) => {
-        console.error("Error posting data:", error);
-      });
+    if (isEditMode) {
+      // Edit mode: Update existing entreprise
+      axios
+        .patch(
+          `http://localhost:8000/api/offrestage/${offre.id}`,
+          offre,
+          config
+        )
+        .then(() => {
+          showSnackbar("success", SNACKBAR_MESSAGES.success.axios.patch);
+          navigate("/admin/offres-stage");
+        })
+        .catch((error) => {
+          showSnackbar("error", SNACKBAR_MESSAGES.error.axios.patch);
+        });
+    } else {
+      axios
+        .post("http://localhost:8000/api/offrestage", offre, config)
+        .then((response) => {
+          console.log(response);
+          navigate("/admin/offres-stage");
+        })
+        .catch((error) => {
+          console.error("Error posting data:", error);
+        });
+    }
   };
 
   return (
