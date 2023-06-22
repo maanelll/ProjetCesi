@@ -64,6 +64,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
+    public function findPilotPromotions()
+{
+    return $this->createQueryBuilder('u')
+        ->select('p.promo')
+        ->innerJoin('u.managedPromotions', 'p')
+        ->where('u.role = :role')
+        ->setParameter('role', 'ROLE_PILOT')
+        ->getQuery()
+        ->getResult();
+}
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

@@ -50,6 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->managedPromotions = new ArrayCollection();
+         $this->wishLists = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -190,6 +191,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->managedPromotions->removeElement($managedPromotion)) {
             if ($managedPromotion->getPilot() === $this) {
                 $managedPromotion->setPilot(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+       /**
+     * @ORM\OneToMany(targetEntity=WishList::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $wishLists;
+
+   /**
+ * @return Collection<int, WishList>
+ */
+public function getWishLists(): Collection
+{
+    if ($this->wishLists === null) {
+        $this->wishLists = new ArrayCollection();
+    }
+    return $this->wishLists;
+}
+
+    public function addWishList(WishList $wishList): self
+    {
+        if (!$this->wishLists->contains($wishList)) {
+            $this->wishLists[] = $wishList;
+            $wishList->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWishList(WishList $wishList): self
+    {
+        if ($this->wishLists->removeElement($wishList)) {
+            // set the owning side to null (unless already changed)
+            if ($wishList->getUser() === $this) {
+                $wishList->setUser(null);
             }
         }
 
