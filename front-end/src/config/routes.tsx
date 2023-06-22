@@ -1,5 +1,6 @@
-import { useRoutes } from "react-router-dom"
-import { Suspense, lazy } from "react"
+import { Suspense, lazy, useContext } from "react";
+import AuthContext from "./authContext";
+import { useRoutes } from "react-router-dom";
 
 const Dashboard = lazy(() => import("../pages/Dashboard"))
 const Login = lazy(()=> import("../pages/Login"))
@@ -10,9 +11,15 @@ const AddOffreStageForm = lazy(() => import("../pages/admin/entreprises/[id]/add
 const Users = lazy(() => import("../pages/admin/users"))
 const  EditUser = lazy(()=> import("../pages/admin/users/[id]/editUser"))
 const CreateUser = lazy(() => import("../pages/admin/users/create"))
+const Internship = lazy(() => import("../pages/Internship"));
+const WishList = lazy(() => import("../pages/WishList"));
 
+
+const OffreStages = lazy(() => import("../pages/admin/offreStages"));
 
 const AppRoutes = () => {
+    const { role } = useContext(AuthContext);
+
     const element = useRoutes([
         {
         path: "/",
@@ -22,6 +29,14 @@ const AppRoutes = () => {
             path :"signIn",
         element: <Login/>
         },
+         {
+      path: "/internships",
+      element: <Internship />,
+    },
+    {
+      path: "/wishList",
+      element: <WishList />,
+    },
         {
             path: "/admin/entreprises",
             element: <Entreprises/>
@@ -39,7 +54,7 @@ const AppRoutes = () => {
             path: "/admin/entreprises/:entrepriseId/addOffreStageForm",
             element: <AddOffreStageForm/>
         },
-        {
+             {
             path: "/admin/users",
             element: <Users/>
         },
@@ -50,10 +65,15 @@ const AppRoutes = () => {
         {
             path: "/admin/users/create",
             element: <CreateUser isEditMode={false}/>
-        }
+        },
+         {
+      path: "/admin/offreStages",
+      element: <OffreStages />,
+    },
+       
         
     ])
     return <Suspense fallback={<div>Loading...</div>}>{element}</Suspense>
 }
+export default AppRoutes;
 
-export default AppRoutes

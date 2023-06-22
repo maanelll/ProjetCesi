@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from "react-router-dom"
 import AuthProvider from './config/AuthProvider';
-
+import { SnackbarProvider } from './context/SnackBarContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,9 +12,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Router>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <SnackbarProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </SnackbarProvider>
     </Router>
   </React.StrictMode>
 );

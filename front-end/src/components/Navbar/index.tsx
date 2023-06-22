@@ -11,7 +11,9 @@ import AuthContext from "../../config/authContext";
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
-  const { logout } = useContext(AuthContext);
+  const { logout, role } = useContext(AuthContext);
+  const isAdmin = role === "ROLE_ADMIN";
+  const isPilot = role === "ROLE_PILOTE";
 
   const handleClick = (link: string) => {
       setOpenedLink(link === openedLink ? "" : link)
@@ -22,6 +24,7 @@ const Navbar = () => {
       navigate(link)
     }
   }
+
   const handleSignOut = () => {
     logout();
   };
@@ -31,14 +34,15 @@ const Navbar = () => {
         backgroundImage: (theme) => theme.palette.gradient.purple,
         borderRadius: "0px 0px 60px 0px",
         height: "100%",
-        px: "10px",
+        width: "265px",
+
       }}
     >
       <Box
         sx={{
           alignItems: "center",
           display: "flex",
-          height: "175px",
+          height: "225px",
           justifyContent: "center",
         }}
       >
@@ -51,8 +55,8 @@ const Navbar = () => {
         >
         <Box
           sx={{
-            width: "70px",
-            height: "70px",
+            width: "80px",
+            height: "80px",
             backgroundImage: `url(${profileImage})`,
             backgroundSize: "cover",
             borderRadius: "50%",
@@ -71,20 +75,35 @@ const Navbar = () => {
             variant="contained"
             onClick={handleSignOut}
             sx={{
-              marginTop: "10px",
+              marginTop: "12px",
+              padding: "10px 25px",
+              
               "&:hover": {
           boxShadow: "3px 3px #Fafad4",
           transition: ".2s",
         },
             }}
           >
-            <Typography sx={{color:"black",fontFamily:"arial"}}>deconnexion</Typography>
+            <Typography sx={{color:"black",fontFamily:"arial",fontSize: "14px"}}>deconnexion</Typography>
           </Button>
           </Box>
       </Box>
+      <Box
+            sx={{
+              width: "100%",
+              borderBottom: "1px solid #ffffff",
+              marginTop: "5px",
+              marginBottom:"15px"
+            }}
+          />
+      
       <Box>
         {Object.keys(routes).map((key) => {
           const { route, text, subLinks, icon } = routes[key]
+          // Skip rendering the administration route if the user is not an admin
+          if (!isAdmin && !isPilot && key === "admin") {
+            return null;
+          } 
           return (
             <Box
               key={key}
@@ -94,20 +113,22 @@ const Navbar = () => {
                 },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center " }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Button
                   variant="containedGradientLarge"
                   onClick={() => handleClick(route)}
-                  color="secondary"
+                  color="primary"
                   sx={{
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "5px",
                     backgroundColor:
                       openedLink === route ? "brown.main" : "transparent",
                     display: "flex",
-                    fontWeight: openedLink === route ? 800 : 600,
+                    fontWeight: openedLink === route ? 750 : 600,
                     justifyContent: "flex-start",
                     position: "relative",
+                    fontSize: "17px",
+                    fontFamily: "Arial",
                     width: "100%",
                     "&:after":
                       openedLink === route && subLinks
@@ -117,7 +138,7 @@ const Navbar = () => {
                             borderTopColor: "brown.main",
                             content: '" "',
                             display: "block",
-                            left: "20%",
+                            left: "12%",
                             position: "absolute",
                             top: "100%",
                           }
@@ -150,7 +171,7 @@ const Navbar = () => {
                         sx={{
                           backgroundColor: "transparent",
                           display: "flex",
-                          height: "35px",
+                          height: "50px",
                           justifyContent: "flex-start",
                           pl: "40px",
                           width: "100%",
@@ -161,6 +182,7 @@ const Navbar = () => {
                           variant="body2"
                           sx={{
                             fontWeight: 500,
+                            fontSize:"16px",
                             "&:hover": { fontWeight: 700 },
                           }}
                         >

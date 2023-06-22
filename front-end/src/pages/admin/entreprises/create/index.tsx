@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { IEntreprise, ILocalite } from "../../../../types";
 import AuthContext from "../../../../config/authContext";
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import { SNACKBAR_MESSAGES } from "../../../../config/constants";
+import { useSnackbar } from "../../../../context/SnackBarContext";
 
 interface CreateEntrepriseProps {
   isEditMode: boolean;
@@ -13,7 +14,8 @@ interface CreateEntrepriseProps {
 }
 
 const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEntreprise}) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const showSnackbar = useSnackbar();
   const { token } = useContext(AuthContext);
   const [entreprise, setEntreprise] = useState<IEntreprise>({
     id: isEditMode ? existingEntreprise?.id || 0 : 0,
@@ -65,7 +67,6 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
             city: localiteData.city,
             code_postal: localiteData.code_postal,
           };
-          console.log(newLocalite)
           setEntreprise((prevData) => ({
             ...prevData,
             localities: [...prevData.localities, newLocalite],
@@ -119,24 +120,26 @@ const CreateEntreprise:React.FC<CreateEntrepriseProps>= ({isEditMode,existingEnt
     nb_cesi: entreprise.nb_cesi,
     localities: localiteIds
   };
-
+  
   if (isEditMode) {
     // Edit mode: Update existing entreprise
     axios.put(`http://localhost:8000/api/entreprise/${entreprise.id}`, entrepriseData, config)
       .then(() => {
+        showSnackbar("success", SNACKBAR_MESSAGES.success.axios.patch)
         navigate("/admin/entreprises");
       })
       .catch((error) => {
-        console.error(error);
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.patch)
       });
   } else {
     // Create mode: Create new entreprise
     axios.post("http://localhost:8000/api/entreprise", entrepriseData, config)
       .then(() => {
+        showSnackbar("success", SNACKBAR_MESSAGES.success.axios.post)
         navigate("/admin/entreprises");
       })
       .catch((error) => {
-        console.error(error);
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.post)
       });
   }
 };

@@ -28,9 +28,13 @@ class Localite
     #[ORM\JoinTable(name: "entreprise_localite")]
     private Collection $entreprises;
 
+    #[ORM\OneToMany(targetEntity: "App\Entity\OffreStage", mappedBy: "Localite")]
+    private Collection $offresL;
+
     public function __construct()
     {
         $this->entreprises = new ArrayCollection();
+        $this->offresL = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -94,6 +98,31 @@ class Localite
     public function setCity(string $city): self
     {
         $this->city = $city;
+
+        return $this;
+    }
+    public function getOffres(): Collection
+    {
+        return $this->offresL;
+    }
+    public function addOffre(OffreStage $offre): self
+    {
+        if (!$this->offresL->contains($offre)) {
+            $this->offresL[] = $offre;
+            $offre->setLocalite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffre(OffreStage $offreL): self
+    {
+        if ($this->offresL->removeElement($offreL)) {
+            // set the owning side to null (unless already changed)
+            if ($offreL->getLocalite() === $this) {
+                $offreL->setLocalite(null);
+            }
+        }
 
         return $this;
     }

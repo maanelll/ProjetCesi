@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Competence;
 use App\Entity\OffreStage;
 use App\Entity\Promotion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OffreStageRepository;
 use DateTimeImmutable;
+use App\Entity\Entreprise;
+use App\Entity\Localite;
+use App\Entity\Competence;
+
 
 
 /**
@@ -37,6 +40,19 @@ class OffreStageContoller extends AbstractController
             }
 
             $offer_date = $offreStage->getOffer_date();
+            $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
+            $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
+            $offer_date = $offreStage->getOffer_date();
+            $competence = $offreStage->getCompetences()->map(fn ($competence) => $competence->getId())->toArray();
+            $localite = $offreStage->getLocalite();
+            if ($localite) {
+                $address = $localite->getAddress();
+                $cpNumber = $localite->getCPNumber();
+                $city = $localite->getCity();
+                $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
+            } else {
+                $completeAddress = null;
+            }
             $data = [
                 'id' => $offreStage->getId(),
                 'name' => $offreStage->getName(),
@@ -44,15 +60,11 @@ class OffreStageContoller extends AbstractController
                 'compensation_basis' => $offreStage->getCompensation_basis(),
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
-                'competences' => array_map(
-                    function ($competence) {
-                        return $competence->getId();
-                    },
-                    $offreStage->getCompetences()->toArray()
-                ),
-                'promotions' => array_map(function ($promotion) {
-                    return $promotion->getId();
-                }, $offreStage->getPromotions()->toArray())
+                'entreprise_name' => $entreprise,
+                'competence' => $competence,
+                'promotion' => $promotions,
+                'localite' => $completeAddress
+
             ];
 
             return new JsonResponse($data);
@@ -62,7 +74,19 @@ class OffreStageContoller extends AbstractController
 
         $data = [];
         foreach ($offreStages as $offreStage) {
+            $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
+            $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
             $offer_date = $offreStage->getOffer_date();
+            $competence = $offreStage->getCompetences()->map(fn ($competence) => $competence->getComp())->toArray();
+            $localite = $offreStage->getLocalite();
+            if ($localite) {
+                $address = $localite->getAddress();
+                $cpNumber = $localite->getCPNumber();
+                $city = $localite->getCity();
+                $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
+            } else {
+                $completeAddress = null;
+            }
             $data[] = [
                 'id' => $offreStage->getId(),
                 'name' => $offreStage->getName(),
@@ -70,15 +94,10 @@ class OffreStageContoller extends AbstractController
                 'compensation_basis' => $offreStage->getCompensation_basis(),
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
-                'competences' => array_map(
-                    function ($competence) {
-                        return $competence->getId();
-                    },
-                    $offreStage->getCompetences()->toArray()
-                ),
-                'promotions' => array_map(function ($promotion) {
-                    return $promotion->getId();
-                }, $offreStage->getPromotions()->toArray())
+                'entreprise_name' => $entreprise,
+                'competence' => $competence,
+                'promotion' => $promotions,
+                'localite' => $completeAddress
             ];
         }
 
@@ -91,6 +110,8 @@ class OffreStageContoller extends AbstractController
     public function creatOffreStage(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        error_log(print_r($data, true));
+
 
         $offrestage = new OffreStage();
 
@@ -124,16 +145,44 @@ class OffreStageContoller extends AbstractController
         }
 
         if (isset($data['promotion'])) {
-            $promotionIds = $data['promotion'];
-            foreach ($promotionIds as $promotionId) {
-                $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
-                if ($promotion) {
-                    $offrestage->addPromotion($promotion);
-                }
+            $promotionId = $data['promotion'];
+            $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
+            if ($promotion) {
+                $offrestage->addPromotion($promotion);
             }
         }
+
+
+        if (isset($data['entreprise_id'])) {
+            $entreprise = $this->entityManager->getRepository(Entreprise::class)->find($data['entreprise_id']);
+            if ($entreprise) {
+                $offrestage->setEntreprise($entreprise);
+            } else {
+                // Gérer la situation lorsque l'entreprise n'existe pas
+                // Par exemple, renvoyer une réponse d'erreur ou attribuer une valeur par défaut
+            }
+        }
+        if (isset($data['localite_id'])) {
+            $localite = $this->entityManager->getRepository(Localite::class)->find($data['localite_id']);
+            if ($localite) {
+                $offrestage->setLocalite($localite);
+            } else {
+                // Handle the situation when the Localite does not exist
+            }
+        }
+
+        if (isset($data['entreprise_id'])) {
+            $entreprise = $this->entityManager->getRepository(Entreprise::class)->find($data['entreprise_id']);
+            if ($entreprise) {
+                $offrestage->setEntreprise($entreprise);
+            } else {
+                // Handle the situation when the Entreprise does not exist
+            }
+        }
+
         $entityManager->persist($offrestage);
         $entityManager->flush();
+
 
         return new JsonResponse(['message' => 'Data created successfully'], JsonResponse::HTTP_CREATED);
     }
@@ -167,7 +216,7 @@ class OffreStageContoller extends AbstractController
         if (isset($data['competence'])) {
             // Remove old competences first
             foreach ($offrestage->getCompetences() as $competence) {
-                $offrestage->removeCompetence($competence);
+                $competence->removeOffreStage($offrestage);
             }
 
             // Add new competences
