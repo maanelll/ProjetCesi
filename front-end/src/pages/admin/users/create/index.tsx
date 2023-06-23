@@ -25,6 +25,9 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
   const [password, setPassword] = useState<string>("");
   const [centerId, setCenterId] = useState<number | null>(null);
   const [pilotPromotions, setPilotPromotions] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
 
   useEffect(() => {
     const config = {
@@ -100,10 +103,42 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
     const selectedPromotions = Array.isArray(event.target.value) ? event.target.value : [event.target.value as number];
     setSelectedPromotions(selectedPromotions);
   };
+const handleValidation = () => {
+    let formIsValid = true;
+    let newErrors = {...errors};
+
+    if(!firstName){
+      formIsValid = false;
+      newErrors["firstName"] = "Le prénom ne peut pas être vide";
+    }
+
+    if(!lastName){
+      formIsValid = false;
+      newErrors["lastName"] = "Le nom de famille ne peut pas être vide";
+    }
+
+    if(!email){
+      formIsValid = false;
+      newErrors["email"] = "L'email ne peut pas être vide";
+    }
+
+    if(!password){
+      formIsValid = false;
+      newErrors["password"] = "Le mot de passe ne peut pas être vide";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
+  }
 
 const handleSubmit = (e: React.FormEvent) => {
   e.preventDefault();
 
+
+    if (!handleValidation()) {
+      console.error("Validation failed.");
+      return;
+    }
   if (roleId === null || centerId === null) {
     console.error("Role and center must be selected.");
     return;
@@ -132,8 +167,15 @@ const handleSubmit = (e: React.FormEvent) => {
         navigate("/admin/users");
       })
       .catch((error) => {
-        console.error(error);
-      });
+          console.error(error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            setErrorMsg(error.response.data.message);  // Set error message from response
+          } else {
+            setErrorMsg('An error occurred');
+          }
+        });
   } else {
     // create a new user with a POST request
     axios.post("https://localhost:8000/api/create_user", userData, config)
@@ -141,14 +183,24 @@ const handleSubmit = (e: React.FormEvent) => {
         navigate("/admin/users");
       })
       .catch((error) => {
-        console.error(error);
-      });
+          console.error(error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            setErrorMsg(error.response.data.message);  // Set error message from response
+          } else {
+            setErrorMsg('An error occurred');
+          }
+        });
   }
 };
 
   return (
     <Box sx={{ p: 3 }}>
       <form onSubmit={handleSubmit}>
+         {errorMsg && (
+          <div>{errorMsg}</div>  // Display error message if it is set
+        )}
         <TextField
           name="firstName"
           label="Nom"
@@ -157,6 +209,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
+           error={errors.firstName ? true : false}
+        helperText={errors.firstName}
         />
         <TextField
           name="lastName"
@@ -166,6 +220,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+          error={errors.lastName ? true : false}
+        helperText={errors.lastName}
         />
         <TextField
           name="email"
@@ -176,6 +232,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+           error={errors.email ? true : false}
+        helperText={errors.email}
         />
         <TextField
           name="password"
@@ -186,6 +244,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+           error={errors.password ? true : false}
+        helperText={errors.password}
         />
         <FormControl fullWidth>
           <InputLabel id="role-select-label">Rôle</InputLabel>
