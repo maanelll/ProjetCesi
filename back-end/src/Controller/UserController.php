@@ -91,8 +91,6 @@ public function getUserById(User $user): Response
 
     return $this->json($data);
 }
-
-
 /**
  * @Route("/create_user", name="create_user", methods={"POST"})
  */
@@ -101,6 +99,7 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
     $em = $doctrine->getManager();
+
     $decoded = json_decode($request->getContent());
     $email = $decoded->email;
     $firstName = $decoded->firstName;
@@ -114,12 +113,18 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $promotions = $doctrine->getRepository(Promotion::class)->findBy(['id' => $promotionIds]);
     $center = $doctrine->getRepository(Center::class)->find($centerId);
 
+    // vérifier si l'email est déjà utilisé
+    $existingUser = $doctrine->getRepository(User::class)->findOneBy(['email' => $email]);
+    if ($existingUser) {
+        return $this->json(['message' => 'Cet e-mail est déjà utilisé'], Response::HTTP_BAD_REQUEST);
+    }
+
     $user = new User();
     $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
-    $user->setPassword($hashedPassword);
     $user->setEmail($email);
     $user->setFirstName($firstName);
     $user->setLastName($lastName);
+    $user->setPassword($hashedPassword);
     $user->setRole($role);
 
     if ($role->getId() === 3) {
@@ -129,9 +134,19 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
         }
         $user->setPromotion($promotions[0]);
     } elseif ($role->getId() === 2) {
-        // Si le rôle est pilote (ID 2), on ajoute toutes les promotions sélectionnées
-        foreach ($promotions as $promotion) {
-            $user->addManagedPromotion($promotion);
+        // Si le rôle est pilote (ID 2), vérifier d'abord si les promotions peuvent être gérées par le pilote
+        foreach ($promotions as $newPromotion) {
+            $pilotManagingPromotion = $newPromotion->getPilot(); // cette méthode est à définir dans la classe Promotion
+
+            if ($pilotManagingPromotion) {
+                return $this->json([
+                    'message' => 'La promotion ' . $newPromotion->getPromo() . ' est déjà gérée par le pilote ' . $pilotManagingPromotion->getFirstName()
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Ensuite, ajouter les nouvelles promotions
+        foreach ($promotions as $newPromotion) {
+            $user->addManagedPromotion($newPromotion);
         }
     } else {
         return $this->json(['message' => 'Rôle invalide'], Response::HTTP_BAD_REQUEST);
@@ -142,8 +157,9 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $em->persist($user);
     $em->flush();
 
-    return $this->json(['message' => 'Utilisateur créé avec succès']);
+    return $this->json(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
 }
+
 
 /**
  * @Route("/update_user/{id}", name="update_user", methods={"PUT"})
@@ -186,9 +202,22 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
         }
         $user->setPromotion($promotions[0]);
     } elseif ($role->getId() === 2) {
-        // Si le rôle est pilote (ID 2), on ajoute toutes les promotions sélectionnées
-        foreach ($promotions as $promotion) {
-            $user->addManagedPromotion($promotion);
+        // Si le rôle est pilote (ID 2), vérifier d'abord si les nouvelles promotions peuvent être gérées par le pilote
+        foreach ($promotions as $newPromotion) {
+            $pilotManagingPromotion = $newPromotion->getPilot(); // cette méthode est à définir dans la classe Promotion
+
+            if ($pilotManagingPromotion && $pilotManagingPromotion->getId() !== $user->getId()) {
+                return $this->json([
+                    'message' => 'La promotion ' . $newPromotion->getPromo() . ' est déjà gérée par le pilote ' . $pilotManagingPromotion->getFirstName()
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Ensuite, supprimer toutes les promotions existantes et ajouter les nouvelles
+        foreach ($user->getManagedPromotions() as $oldPromotion) {
+            $user->removeManagedPromotion($oldPromotion);
+        }
+        foreach ($promotions as $newPromotion) {
+            $user->addManagedPromotion($newPromotion);
         }
     } else {
         return $this->json(['message' => 'Rôle invalide'], Response::HTTP_BAD_REQUEST);

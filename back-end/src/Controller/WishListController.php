@@ -73,29 +73,46 @@ public function showWishlist(int $userId, UserRepository $userRepository, WishLi
     $user = $userRepository->find($userId);
     $role = $user->getRole();
    
-        if(!$user || $role->getName() !== 'ROLE_ETUDIANT') {
-            throw $this->createNotFoundException('No student found');
-        }
+    if(!$user || $role->getName() !== 'ROLE_ETUDIANT') {
+        throw $this->createNotFoundException('No student found');
+    }
 
     $wishlist = $wishListRepository->findBy(['user' => $user]);
 
     $offreStages = [];
     foreach($wishlist as $wish) {
         $offreStage = $wish->getOffreStage();
+
+        $offer_date = $offreStage->getOffer_date();
+        $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
+        $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
+        $offer_date = $offreStage->getOffer_date();
+        $competences = $offreStage->getCompetences()->map(fn ($competence) => $competence->getId())->toArray();
+        $localite = $offreStage->getLocalite();
+        if ($localite) {
+            $address = $localite->getAddress();
+            $cpNumber = $localite->getCPNumber();
+            $city = $localite->getCity();
+            $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
+        } else {
+            $completeAddress = null;
+        }
         
         $offreStages[] = [
             'id' => $offreStage->getId(),
+            'name' => $offreStage->getName(),
             'internship_duration' => $offreStage->getInternship_duration(),
             'compensation_basis' => $offreStage->getCompensation_basis(),
-            'offer_date' => $offreStage->getOffer_date() ? $offreStage->getOffer_date()->format('Y-m-d') : null,
+            'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
             'nb_places_offered' => $offreStage->getNb_places_offered(),
-            'name' => $offreStage->getName(),
-            'competences' => $offreStage->getCompetences()->map(function(Competence $competence) { return $competence->getId(); })->toArray(),
-            'promotions' => $offreStage->getPromotions()->map(function(Promotion $promotion) { return $promotion->getId(); })->toArray(),
+            'entreprise_name' => $entreprise,
+            'competences' => $competences,
+            'promotions' => $promotions,
+            'localite' => $completeAddress,
         ];
     }
 
     return new JsonResponse($offreStages);
-} 
+}
 
 }
