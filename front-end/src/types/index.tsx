@@ -32,7 +32,7 @@ export interface ICentre {
 }
 export interface IPromotion {
     id: number
-    prom:string
+    promo:string
 }
 export interface ICenter {
     id: number
