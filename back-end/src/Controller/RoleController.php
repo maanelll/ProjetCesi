@@ -24,18 +24,18 @@ class RoleController extends AbstractController
     /**
      * @Route("/roles", name="get_roles", methods={"GET"})
      */
-    public function getRoles(RoleRepository $repository): JsonResponse
-    { 
-            $role = $repository->findAll();
-            $data = [];
-            foreach ($role as $role) {
-                $data[] = [
-                    'id' => $role->getId(),
-                    'role' => $role->getName(),
-                ];
-            }
-        return new JsonResponse($data);
-        
+public function getRoles(RoleRepository $repository): JsonResponse
+{ 
+    $roles = $repository->findAllExceptId(1);
+    $data = [];
+    foreach ($roles as $role) {
+        $data[] = [
+            'id' => $role->getId(),
+            'role' => $role->getName(),
+        ];
     }
+    return new JsonResponse($data);
+}
+
 
 }

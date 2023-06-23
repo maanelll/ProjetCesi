@@ -6,11 +6,18 @@ import { useNavigate } from "react-router-dom";
 import { IUser, IPromotion } from "../../../types";
 import AuthContext from "../../../config/authContext";
 import { EditOutlined as EditIcon, DeleteOutline as DeleteIcon } from "@mui/icons-material";
+import { styled } from "@mui/system";
 
 const UsersList: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const [users, setUsers] = useState<IUser[]>([]);
+
+const StyledHeaderCell = styled("div")`
+  font-size: 16px; 
+  font-weight: bold;
+  text-align: "center";
+`;
   
   const config = {
     headers: {
@@ -72,14 +79,15 @@ const UsersList: React.FC = () => {
   }, []);
   
   const columns: GridColDef[] = [
-    { field: "firstName", headerName: "Nom", width: 150 },
-    { field: "lastName", headerName: "Prénom", width: 150 },
-    { field: "role", headerName: "Rôle", width: 150 },
-    { field: "center", headerName: "Centre", width: 150 },
+    { field: "firstName", headerName: "Nom", width: 200 ,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
+    { field: "lastName", headerName: "Prénom",width: 200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
+    { field: "role", headerName: "Rôle", width:200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
+    { field: "center", headerName: "Centre",width: 200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
     {
       field: "promotions",
       headerName: "Promotions",
       width: 200,
+      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>, 
       renderCell: (params: GridCellParams) => {
         const user = params.row as IUser;
         if (Array.isArray(user.promotions)) {
@@ -99,7 +107,8 @@ const UsersList: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 200,
+      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> ,
       renderCell: (params: GridCellParams) => {
         const userId = params.row.id as number;
         return (
