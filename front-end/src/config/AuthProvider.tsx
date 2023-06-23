@@ -47,6 +47,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       decodeAndSetRole(newToken);
     } catch (error) {
       setErrorMessage('email ou  mot de passe invalide');
+      console.log(error)
     }
   };
 
