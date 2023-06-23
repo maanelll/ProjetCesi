@@ -38,7 +38,13 @@ class RoleRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
+public function findAllExceptId($id) {
+    return $this->createQueryBuilder('r')
+        ->where('r.id != :id')
+        ->setParameter('id', $id)
+        ->getQuery()
+        ->getResult();
+}
 //    /**
 //     * @return Role[] Returns an array of Role objects
 //     */
