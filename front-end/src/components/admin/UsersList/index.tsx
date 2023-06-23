@@ -19,7 +19,7 @@ const UsersList: React.FC = () => {
   };
   
   const handleDeleteUserClick = (userId: number) => {
-    axios.delete(`https://localhost:8000/api/delete_user/${userId}`, config)
+    axios.delete(`http://localhost:8000/api/delete_user/${userId}`, config)
       .then(() => {
         // Refresh the users list after deletion
         fetchUsers();
@@ -34,7 +34,7 @@ const UsersList: React.FC = () => {
   };
   
  const fetchUsers = () => {
-    axios.get(`https://localhost:8000/api/users`, config)
+    axios.get(`http://localhost:8000/api/users`, config)
         .then((response) => {
             const users = response.data.map((user: any) => {
                 // Si promotions est une chaîne, convertissez-la en un tableau contenant un objet IPromotion

@@ -16,7 +16,7 @@ const EditUser = () => {
     }
   };
     useEffect(() => {
-    axios.get(`https://localhost:8000/api/user/${userId}`,config)
+    axios.get(`http://localhost:8000/api/user/${userId}`,config)
       .then(response => {
         setUser(response.data);
         console.log(response.data); 

@@ -33,7 +33,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
       }
     };
 
-    axios.get('https://localhost:8000/api/roles', config)
+    axios.get('http://localhost:8000/api/roles', config)
       .then(response => {
         setRoles(response.data);
       })
@@ -41,7 +41,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
         console.error("Error fetching roles:", error);
       });
 
-    axios.get('https://localhost:8000/api/centers', config)
+    axios.get('http://localhost:8000/api/centers', config)
       .then(response => {
         setCenters(response.data);
       })
@@ -49,7 +49,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
         console.error("Error fetching centers:", error);
       });
 
-    axios.get('https://localhost:8000/api/promotion', config)
+    axios.get('http://localhost:8000/api/promotion', config)
       .then(response => {
         setPromotions(response.data);
       })
@@ -75,7 +75,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
     }
      // Fetch pilot promotions if the selected role is "pilot"
   if (roleId === 2) {
-    axios.get('https://localhost:8000/api/pilot_promotions', config)
+    axios.get('http://localhost:8000/api/pilot_promotions', config)
       .then(response => {
         setPilotPromotions(response.data);
       })
@@ -127,7 +127,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
   if (isEditMode && existingUser) {
     // update the existing user with a PUT request
-    axios.put(`https://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
+    axios.put(`http://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
       .then(() => {
         navigate("/admin/users");
       })
@@ -136,7 +136,7 @@ const handleSubmit = (e: React.FormEvent) => {
       });
   } else {
     // create a new user with a POST request
-    axios.post("https://localhost:8000/api/create_user", userData, config)
+    axios.post("http://localhost:8000/api/create_user", userData, config)
       .then(() => {
         navigate("/admin/users");
       })

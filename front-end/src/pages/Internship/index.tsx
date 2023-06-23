@@ -7,13 +7,14 @@ import AuthContext from '../../config/authContext';
 
 
 const Internship = () => {
-    const { token } = useContext(AuthContext);
+    const { token,loggedUser } = useContext(AuthContext);
     const [favorites, setFavorites] = useState<number[]>([]);
     const [searchSkills, setSearchSkills] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
     const [internships, setInternships] = useState<IOffrestage[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(3);
+    const userId = loggedUser?.id;
     const config = {
     headers: {
       Authorization: `Bearer ${token}` 
@@ -43,12 +44,37 @@ const Internship = () => {
         });
     }, []);
     const handleFavoriteClick = (id: number) => {
-        if (favorites.includes(id)) {
-        setFavorites(favorites.filter((favoriteId) => favoriteId !== id));
-        } else {
-        setFavorites([...favorites, id]);
-        }
-    };
+  const isFavorite = favorites.includes(id);
+  
+  if (isFavorite) {
+    // If already a favorite, remove it
+    setFavorites(favorites.filter((favoriteId) => favoriteId !== id));
+    // Make the API call to remove the favorite
+    axios
+      .delete(`http://localhost:8000/api/remove_offer/${userId}/${id}`,config)
+      .then(response => {
+        // Handle the success response if needed
+      })
+      .catch(error => {
+        // Handle the error if needed
+        console.error('Error removing offer:', error);
+      });
+  } else {
+    // If not a favorite, add it
+    setFavorites([...favorites, id]);
+    // Make the API call to add the favorite
+    axios
+      .post(`http://localhost:8000/api/add_offer/${userId}/${id}`,null,config)
+      .then(response => {
+        // Handle the success response if needed
+      })
+      .catch(error => {
+        // Handle the error if needed
+        console.error('Error adding offer:', error);
+      });
+  }
+};
+
 
     const handleSkillsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchSkills(event.target.value);

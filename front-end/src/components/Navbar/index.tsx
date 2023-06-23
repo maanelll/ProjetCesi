@@ -11,7 +11,7 @@ import AuthContext from "../../config/authContext";
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
-  const { logout, role } = useContext(AuthContext);
+  const { logout, role, loggedUser } = useContext(AuthContext);
   const isAdmin = role === "ROLE_ADMIN";
   const isPilot = role === "ROLE_PILOTE";
 
@@ -68,8 +68,8 @@ const Navbar = () => {
           sx={{
             color: "#fff",
           }}
-        >
-          Aymen KALLEL
+          >
+            {loggedUser?loggedUser?.firstName + " " +(loggedUser?.lastName):""}
           </Typography>
           <Button
             variant="contained"
