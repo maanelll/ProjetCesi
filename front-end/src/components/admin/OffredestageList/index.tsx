@@ -11,6 +11,9 @@ import { Search } from "@mui/icons-material";
 import AuthContext from "../../../config/authContext";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { useSnackbar } from "../../../context/SnackBarContext";
+import { SNACKBAR_MESSAGES } from "../../../config/constants";
+import { useNavigate } from "react-router-dom";
 
 const OffredestageList: React.FC = () => {
   const { token } = useContext(AuthContext);
@@ -20,6 +23,26 @@ const OffredestageList: React.FC = () => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+  };
+  const navigate = useNavigate();
+
+  const showSnackbar = useSnackbar();
+
+  const handleDeleteOffreClick = (offreId: number) => {
+    axios
+      .delete(`http://localhost:8000/api/offrestage/${offreId}`, config)
+      .then(() => {
+        setOffreStage((prevState) =>
+          prevState.filter((ent) => ent.id !== offreId)
+        );
+        showSnackbar("success", SNACKBAR_MESSAGES.success.axios.delete);
+      })
+      .catch(() => {
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.delete);
+      });
+  };
+  const handleEditOffreClick = (offreId: number) => {
+    navigate(`/admin/offrestages/${offreId}/edit`);
   };
 
   useEffect(() => {
@@ -95,13 +118,13 @@ const OffredestageList: React.FC = () => {
           <>
             <Button
               variant="contained"
-              //   onClick={() => handleDeleteEntrepriseClick(params.row.id)}
+              onClick={() => handleDeleteOffreClick(params.row.id)}
             >
               delete
             </Button>
             <Button
               variant="contained"
-              //   onClick={() => handleEditEntrepriseClick(params.row.id)}
+              onClick={() => handleEditOffreClick(params.row.id)}
             >
               edit
             </Button>

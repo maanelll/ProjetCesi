@@ -41,9 +41,20 @@ class OffreStageContoller extends AbstractController
 
             $offer_date = $offreStage->getOffer_date();
             $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
-            $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
+            $promotions = $offreStage->getPromotions()->map(function ($promotion) {
+                return [
+                    "id" => $promotion->getId(),
+                    "promo" => $promotion->getPromo()
+                ];
+            })->toArray();
+
             $offer_date = $offreStage->getOffer_date();
-            $competence = $offreStage->getCompetences()->map(fn ($competence) => $competence->getId())->toArray();
+            $competences = $offreStage->getCompetences()->map(function ($competence) {
+                return [
+                    'id' => $competence->getId(),
+                    'comp' => $competence->getComp(),
+                ];
+            })->toArray();
             $localite = $offreStage->getLocalite();
             if ($localite) {
                 $address = $localite->getAddress();
@@ -61,7 +72,7 @@ class OffreStageContoller extends AbstractController
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
                 'entreprise_name' => $entreprise,
-                'competence' => $competence,
+                'competence' => $competences,
                 'promotion' => $promotions,
                 'localite' => $completeAddress
 
@@ -75,9 +86,19 @@ class OffreStageContoller extends AbstractController
         $data = [];
         foreach ($offreStages as $offreStage) {
             $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
-            $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
+            $promotions = $offreStage->getPromotions()->map(function ($promotion) {
+                return [
+                    "id" => $promotion->getId(),
+                    "promo" => $promotion->getPromo()
+                ];
+            })->toArray();
             $offer_date = $offreStage->getOffer_date();
-            $competence = $offreStage->getCompetences()->map(fn ($competence) => $competence->getComp())->toArray();
+            $competences = $offreStage->getCompetences()->map(function ($competence) {
+                return [
+                    'id' => $competence->getId(),
+                    'comp' => $competence->getComp(),
+                ];
+            })->toArray();
             $localite = $offreStage->getLocalite();
             if ($localite) {
                 $address = $localite->getAddress();
@@ -95,7 +116,7 @@ class OffreStageContoller extends AbstractController
                 'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
                 'nb_places_offered' => $offreStage->getNb_places_offered(),
                 'entreprise_name' => $entreprise,
-                'competence' => $competence,
+                'competence' => $competences,
                 'promotion' => $promotions,
                 'localite' => $completeAddress
             ];

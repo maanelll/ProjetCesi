@@ -7,6 +7,7 @@ import AddOffreStageForm from "../../../entreprises/[id]/addOffreStageForm";
 
 const EditOffreStage = () => {
   const { offreStageId } = useParams();
+
   const [offreStage, setOffreStage] = useState<IOffrestage | null>(null);
   const { token } = useContext(AuthContext);
   const config = {
@@ -15,6 +16,7 @@ const EditOffreStage = () => {
     },
   };
   useEffect(() => {
+    console.log(offreStageId);
     axios
       .get(`http://localhost:8000/api/offrestage/${offreStageId}`, config)
       .then((response) => {
@@ -27,7 +29,7 @@ const EditOffreStage = () => {
   return (
     <div>
       {offreStage ? (
-        <AddOffreStageForm isEditMode={true} existingEntreprise={offreStage} />
+        <AddOffreStageForm isEditMode={true} existingOffrestage={offreStage} />
       ) : (
         <p>chargement des données de l'entreprise...</p>
       )}

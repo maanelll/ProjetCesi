@@ -23,7 +23,7 @@ import {
 import { SNACKBAR_MESSAGES } from "../../../../../config/constants";
 import axios from "axios";
 import AuthContext from "../../../../../config/authContext";
-import { useSnackbar } from "@mui/base";
+import { useSnackbar } from "../../../../../context/SnackBarContext";
 interface addOffreStageFormPropos {
   isEditMode: boolean;
   existingOffrestage?: IOffrestage | null;
@@ -52,10 +52,10 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
       : 0,
     promotion: isEditMode ? existingOffrestage?.promotion || [] : [],
     competence: isEditMode ? existingOffrestage?.competence || [] : [],
-    entreprise_name: isEditMode
-      ? existingOffrestage?.entreprise_name || ""
-      : "",
-    localite: isEditMode ? existingOffrestage?.localite || "" : "",
+    entreprise_id: isEditMode
+      ? Number(existingOffrestage?.entreprise_id) || 0
+      : 0,
+    localite: isEditMode ? existingOffrestage?.localite || [] : [],
   });
 
   const [localites, setLocalites] = useState<ILocalite[]>([]);
@@ -80,6 +80,10 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
       .get("http://localhost:8000/api/promotion", config)
       .then((response) => {
         setPromotions(response.data);
+        if (isEditMode) {
+          const selectedPromoId = existingOffrestage?.promotion[0]?.id || "";
+          setSelectedPromotion(selectedPromoId.toString());
+        }
       })
       .catch((error) => {
         console.error("Error fetching promotions:", error);
@@ -118,24 +122,14 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
             id: response.data.id,
             comp: competenceData.comp,
           };
+          setOffre((prevData) => ({
+            ...prevData,
+            competence: [...prevData.competence, newCompetence],
+          }));
+
           setCompetencesInput({
             id: 0,
             comp: "",
-          });
-          return newCompetence;
-        })
-        .then((newCompetence) => {
-          setOffre((prevData) => {
-            const updatedCompetences = prevData.competence
-              ? [...prevData.competence, newCompetence]
-              : [newCompetence];
-
-            console.log(updatedCompetences); // Log the competences data
-
-            return {
-              ...prevData,
-              competence: updatedCompetences,
-            };
           });
         })
         .catch((error) => {
@@ -143,25 +137,27 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
         });
     }
   };
-
   useEffect(() => {
     axios
       .get(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
       .then((response) => {
         setLocalites(response.data.localities);
+        setOffre((prevData) => ({
+          ...prevData,
+          entreprise_id: Number(entrepriseId),
+        }));
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, [entrepriseId]);
-
   const handleRemoveCompetence = (competenceId: number) => {
     axios
       .delete(`http://localhost:8000/api/competence/${competenceId}`, config)
       .then(() => {
         setOffre((prevData) => ({
           ...prevData,
-          competences: prevData.competence?.filter(
+          competence: prevData.competence?.filter(
             (competence) => competence.id !== competenceId
           ),
         }));
@@ -171,7 +167,19 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
         console.error(error);
       });
   };
+  const competenceIds = offre.competence?.map((competence) => competence.id);
 
+  const offreStage = {
+    name: offre.name,
+    internship_duration: offre.internship_duration,
+    compensation_basis: offre.compensation_basis,
+    offer_date: offre.offer_date,
+    nb_places_offered: offre.nb_places_offered,
+    promotion: selectedPromotion,
+    localite_id: selectedLocality,
+    competence: competenceIds,
+    entreprise_id: entrepriseId,
+  };
   const handlePromotionChange = (event: SelectChangeEvent) => {
     setSelectedPromotion(event.target.value as string);
   };
@@ -183,21 +191,18 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
       console.error("offer_date or entrepriseId cannot be null");
       return;
     }
-    const competenceIds = offre.competence?.map((competence) => competence.id);
 
-    const offreStage = {
-      name: offre.name,
-      internship_duration: offre.internship_duration,
-      compensation_basis: offre.compensation_basis,
-      offer_date: offre.offer_date,
-      nb_places_offered: offre.nb_places_offered,
-      promotion: selectedPromotion,
-      localite_id: selectedLocality,
-      competence: competenceIds,
-      entreprise_id: parseInt(entrepriseId),
-    };
     if (isEditMode) {
-      // Edit mode: Update existing entreprise
+      axios
+        .post("http://localhost:8000/api/offrestage", offreStage, config)
+        .then((response) => {
+          console.log(response);
+          navigate("/admin/offreStages");
+        })
+        .catch((error) => {
+          console.error("Error posting data:", error);
+        });
+    } else {
       axios
         .patch(
           `http://localhost:8000/api/offrestage/${offre.id}`,
@@ -206,20 +211,10 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
         )
         .then(() => {
           showSnackbar("success", SNACKBAR_MESSAGES.success.axios.patch);
-          navigate("/admin/offres-stage");
+          navigate("/admin/offreStages");
         })
-        .catch((error) => {
+        .catch(() => {
           showSnackbar("error", SNACKBAR_MESSAGES.error.axios.patch);
-        });
-    } else {
-      axios
-        .post("http://localhost:8000/api/offrestage", offre, config)
-        .then((response) => {
-          console.log(response);
-          navigate("/admin/offres-stage");
-        })
-        .catch((error) => {
-          console.error("Error posting data:", error);
         });
     }
   };
