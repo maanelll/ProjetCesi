@@ -12,20 +12,32 @@ export interface ILocalite {
   code_postal: string;
   city: string;
 }
-export interface IEtudiant {
+export interface IUser {
+    id: number
+    firstName: string
+    lastName:string
+    email: string
+    password:string
+    role: IRole
+    promotions: IPromotion[]
+    center:ICenter
+}
+export interface IRole {
   id: number;
-  nom: string;
-  prenom: string;
-  email: string;
-  motdepasse: string;
-  centre: string;
-  promotion: string;
+  role: string;
 }
 export interface ICentre {
-  id: number;
-  centre: string;
+    id: number
+    centre:string
 }
-
+export interface IPromotion {
+    id: number
+    promo:string
+}
+export interface ICenter {
+    id: number
+    center:string
+}
 export interface IOffrestage {
   id: number;
   internship_duration: number;
@@ -41,8 +53,4 @@ export interface IOffrestage {
 export interface ICompetence {
   id: number;
   comp: string;
-}
-export interface IPromotion {
-  id: number;
-  promo: string;
 }

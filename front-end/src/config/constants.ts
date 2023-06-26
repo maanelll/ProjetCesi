@@ -41,8 +41,8 @@ export const routes: RouteType = {
             text: "Gestion des entreprises"
           },
           {
-            route: "/admin/etudiants",
-            text: "Gestion des etudiants"
+            route: "/admin/users",
+            text: "Gestion des utilisateurs"
           },
           {
             route: "/admin/offreStages",

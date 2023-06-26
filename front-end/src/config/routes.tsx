@@ -13,11 +13,9 @@ const EditEntreprise = lazy(
 const AddOffreStageForm = lazy(
   () => import("../pages/admin/entreprises/[id]/addOffreStageForm")
 );
-const Etudiants = lazy(() => import("../pages/admin/etudiants"));
-const EditEtudiant = lazy(
-  () => import("../pages/admin/etudiants/[id]/editEtudiant")
-);
-const CreateEtudiant = lazy(() => import("../pages/admin/etudiants/create"));
+const Users = lazy(() => import("../pages/admin/users"));
+const EditUser = lazy(() => import("../pages/admin/users/[id]/editUser"));
+const CreateUser = lazy(() => import("../pages/admin/users/create"));
 const Internship = lazy(() => import("../pages/Internship"));
 const WishList = lazy(() => import("../pages/WishList"));
 
@@ -26,10 +24,15 @@ const EditOffreStage = lazy(
   () => import("../pages/admin/offreStages/[id]/editOffreStage")
 );
 const AppRoutes = () => {
+  const { role } = useContext(AuthContext);
   const element = useRoutes([
     {
       path: "/",
       element: <Dashboard />,
+    },
+    {
+      path: "signIn",
+      element: <Login />,
     },
     {
       path: "/internships",
@@ -59,17 +62,18 @@ const AppRoutes = () => {
       path: "/admin/entreprises/:entrepriseId/addOffreStageForm",
       element: <AddOffreStageForm isEditMode={false} />,
     },
+
     {
-      path: "/admin/etudiants",
-      element: <Etudiants />,
+      path: "/admin/users",
+      element: <Users />,
     },
     {
-      path: "/admin/etudiants/:etudiantId/edit",
-      element: <EditEtudiant />,
+      path: "/admin/users/:userId/edit",
+      element: <EditUser />,
     },
     {
-      path: "/admin/etudiants/create",
-      element: <CreateEtudiant isEditMode={false} />,
+      path: "/admin/users/create",
+      element: <CreateUser isEditMode={false} />,
     },
     {
       path: "/admin/offreStages",

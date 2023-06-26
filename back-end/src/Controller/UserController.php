@@ -18,6 +18,79 @@ use App\Entity\Role;
  */
 class UserController extends AbstractController
 {
+
+/**
+ * @Route("/api/pilot_promotions", name="pilot_promotions", methods={"GET"})
+ */
+public function getPilotPromotions(EntityManagerInterface $entityManager): Response
+{
+    $pilotPromotions = [];
+
+    // Récupérer tous les utilisateurs ayant un rôle avec l'ID 2 (pilotes)
+    $users = $entityManager->getRepository(User::class)->findBy(['role' => 2]);
+
+    // Parcourir chaque utilisateur (pilote)
+    foreach ($users as $user) {
+        // Récupérer les promotions attribuées à l'utilisateur (pilote)
+        $promotions = $user->getPromotions();
+
+        // Parcourir chaque promotion et ajouter à la liste des promotions attribuées aux pilotes
+        foreach ($promotions as $promotion) {
+            $pilotPromotions[] = $promotion;
+        }
+    }
+
+    // Retourner les promotions sous forme de réponse JSON
+    return $this->json($pilotPromotions);
+}
+
+/**
+ * @Route("/user/{id}", name="get_user_by_id", methods={"GET"})
+ */
+public function getUserById(User $user): Response
+{
+    $role = $user->getRole();
+    $roleData = [
+        'id' => $role->getId(),
+        'name' => $role->getName(),
+    ];
+
+    $center = $user->getCenter();
+    $centerData = $center ? ['id' => $center->getId(), 'centerName' => $center->getCenterName()] : null;
+
+    if ($role->getName() === 'ROLE_ETUDIANT') {
+        $promotion = $user->getPromotion();
+        $promotionData = $promotion ? ['id' => $promotion->getId(), 'promo' => $promotion->getPromo()] : null;
+
+        $data = [
+            'id'=>$user->getId(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email'=>$user->getEmail(),
+            'password'=>$user->getPassword(),
+            'promotions' => $promotionData,
+            'center' => $centerData,
+            'role' => $roleData,
+        ];
+    } else if ($role->getName() === 'ROLE_PILOTE') {
+        $promotions = $user->getManagedPromotions()->map(function($promotion) {
+            return ['id' => $promotion->getId(), 'promo' => $promotion->getPromo()];
+        })->toArray();
+
+        $data = [
+            'id'=>$user->getId(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email'=>$user->getEmail(),
+            'password'=>$user->getPassword(),
+            'promotions' => $promotions,
+            'center' => $centerData,
+            'role' => $roleData,
+        ];
+    }
+
+    return $this->json($data);
+}
 /**
  * @Route("/create_user", name="create_user", methods={"POST"})
  */
@@ -26,6 +99,7 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
     $em = $doctrine->getManager();
+
     $decoded = json_decode($request->getContent());
     $email = $decoded->email;
     $firstName = $decoded->firstName;
@@ -39,12 +113,18 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $promotions = $doctrine->getRepository(Promotion::class)->findBy(['id' => $promotionIds]);
     $center = $doctrine->getRepository(Center::class)->find($centerId);
 
+    // vérifier si l'email est déjà utilisé
+    $existingUser = $doctrine->getRepository(User::class)->findOneBy(['email' => $email]);
+    if ($existingUser) {
+        return $this->json(['message' => 'Cet e-mail est déjà utilisé'], Response::HTTP_BAD_REQUEST);
+    }
+
     $user = new User();
     $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
-    $user->setPassword($hashedPassword);
     $user->setEmail($email);
     $user->setFirstName($firstName);
     $user->setLastName($lastName);
+    $user->setPassword($hashedPassword);
     $user->setRole($role);
 
     if ($role->getId() === 3) {
@@ -54,9 +134,19 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
         }
         $user->setPromotion($promotions[0]);
     } elseif ($role->getId() === 2) {
-        // Si le rôle est pilote (ID 2), on ajoute toutes les promotions sélectionnées
-        foreach ($promotions as $promotion) {
-            $user->addManagedPromotion($promotion);
+        // Si le rôle est pilote (ID 2), vérifier d'abord si les promotions peuvent être gérées par le pilote
+        foreach ($promotions as $newPromotion) {
+            $pilotManagingPromotion = $newPromotion->getPilot(); // cette méthode est à définir dans la classe Promotion
+
+            if ($pilotManagingPromotion) {
+                return $this->json([
+                    'message' => 'La promotion ' . $newPromotion->getPromo() . ' est déjà gérée par le pilote ' . $pilotManagingPromotion->getFirstName()
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Ensuite, ajouter les nouvelles promotions
+        foreach ($promotions as $newPromotion) {
+            $user->addManagedPromotion($newPromotion);
         }
     } else {
         return $this->json(['message' => 'Rôle invalide'], Response::HTTP_BAD_REQUEST);
@@ -67,8 +157,9 @@ public function create(ManagerRegistry $doctrine, Request $request, UserPassword
     $em->persist($user);
     $em->flush();
 
-    return $this->json(['message' => 'Utilisateur créé avec succès']);
+    return $this->json(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
 }
+
 
 /**
  * @Route("/update_user/{id}", name="update_user", methods={"PUT"})
@@ -111,9 +202,22 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
         }
         $user->setPromotion($promotions[0]);
     } elseif ($role->getId() === 2) {
-        // Si le rôle est pilote (ID 2), on ajoute toutes les promotions sélectionnées
-        foreach ($promotions as $promotion) {
-            $user->addManagedPromotion($promotion);
+        // Si le rôle est pilote (ID 2), vérifier d'abord si les nouvelles promotions peuvent être gérées par le pilote
+        foreach ($promotions as $newPromotion) {
+            $pilotManagingPromotion = $newPromotion->getPilot(); // cette méthode est à définir dans la classe Promotion
+
+            if ($pilotManagingPromotion && $pilotManagingPromotion->getId() !== $user->getId()) {
+                return $this->json([
+                    'message' => 'La promotion ' . $newPromotion->getPromo() . ' est déjà gérée par le pilote ' . $pilotManagingPromotion->getFirstName()
+                ], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Ensuite, supprimer toutes les promotions existantes et ajouter les nouvelles
+        foreach ($user->getManagedPromotions() as $oldPromotion) {
+            $user->removeManagedPromotion($oldPromotion);
+        }
+        foreach ($promotions as $newPromotion) {
+            $user->addManagedPromotion($newPromotion);
         }
     } else {
         return $this->json(['message' => 'Rôle invalide'], Response::HTTP_BAD_REQUEST);
@@ -161,22 +265,24 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
         foreach ($users as $user) {
             $role = $user->getRole()->getName();
 
-            if ($role === 'ROLE_STUDENT') {
+            if ($role === 'ROLE_ETUDIANT') {
                 $promotion = $user->getPromotion() ? $user->getPromotion()->getPromo() : null;
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
                 $data[] = [
+                    'id'=>$user->getId(),
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
-                    'promotion' => $promotion,
+                    'promotions' => $promotion,
                     'center' => $center,
                     'role' => $role,
                 ];
-            } else if ($role === 'ROLE_PILOT') {
+            } else if ($role === 'ROLE_PILOTE') {
                 $promotions = $user->getManagedPromotions()->map(fn($promotion) => $promotion->getPromo())->toArray();
                 $center = $user->getCenter() ? $user->getCenter()->getCenterName() : null;
 
                 $data[] = [
+                    'id'=>$user->getId(),
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
                     'promotions' => $promotions,
@@ -188,5 +294,30 @@ public function update(ManagerRegistry $doctrine, Request $request, UserPassword
 
         return $this->json($data);
     }
+
+    /**
+ * @Route("/loggedUser", name="api_user_me", methods={"GET"})
+ */
+public function me(): Response
+{
+    // Récupère l'utilisateur actuellement connecté
+    $user = $this->getUser();
+
+    // Si aucun utilisateur n'est connecté, renvoie une erreur
+    if (!$user) {
+        return $this->json([
+            'message' => 'aucun utilisateur connecté'
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    // Renvoie les informations de l'utilisateur en format JSON
+    return $this->json([
+        'id' => $user->getId(),
+        'firstName' => $user->getFirstName(),
+        'lastName' => $user->getLastName(),
+      
+    ]);
+}
+
 }
 

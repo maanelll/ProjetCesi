@@ -54,6 +54,7 @@ class OffreStage
     {
         $this->competences = new ArrayCollection();
         $this->promotions = new ArrayCollection();
+        $this->wishLists = new ArrayCollection();
     }
 
     // Getters and setters
@@ -192,6 +193,40 @@ class OffreStage
     public function setLocalite(?Localite $localite): self
     {
         $this->localite = $localite;
+
+        return $this;
+    }
+    /**
+     * @ORM\OneToMany(targetEntity=WishList::class, mappedBy="offreStage", orphanRemoval=true)
+     */
+    private $wishLists;
+
+    /**
+     * @return Collection|WishList[]
+     */
+    public function getWishLists(): Collection
+    {
+        return $this->wishLists;
+    }
+
+    public function addWishList(WishList $wishList): self
+    {
+        if (!$this->wishLists->contains($wishList)) {
+            $this->wishLists[] = $wishList;
+            $wishList->setOffreStage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWishList(WishList $wishList): self
+    {
+        if ($this->wishLists->removeElement($wishList)) {
+            // set the owning side to null (unless already changed)
+            if ($wishList->getOffreStage() === $this) {
+                $wishList->setOffreStage(null);
+            }
+        }
 
         return $this;
     }
