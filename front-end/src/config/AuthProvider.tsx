@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AuthContext from './authContext';
 import { useNavigate } from 'react-router-dom';
+import { IUser } from '../types';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [loggedUser, setLoggedUser] = useState<IUser | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
     
   useEffect(() => {
@@ -21,8 +23,22 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(true);
       setToken(storedToken);
       decodeAndSetRole(storedToken);
+      fetchLoggedUserData(storedToken);
     } 
   }, []);
+   const fetchLoggedUserData = async (token: string): Promise<void> => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/loggedUser', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const userData: IUser = response.data;
+      setLoggedUser(userData);
+    } catch (error) {
+      console.error('Error fetching logged user data:', error);
+    }
+  };
   
   const decodeAndSetRole = (token: string): void => {
       var base64Url = token.split('.')[1];
@@ -47,7 +63,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       decodeAndSetRole(newToken);
     } catch (error) {
       setErrorMessage('email ou  mot de passe invalide');
-      console.log(error)
     }
   };
 
@@ -59,7 +74,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated,token,errorMessage,role, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated,token,errorMessage,role,loggedUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

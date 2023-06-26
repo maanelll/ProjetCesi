@@ -50,7 +50,18 @@ export interface IOffrestage {
   entreprise_name: string;
   localite: string;
 }
+export interface IWishlist {
+  id: number;
+  internship_duration: number;
+  compensation_basis: number;
+  offer_date: Date;
+  nb_places_offered: number;
+  name: string;
+  competence: ICompetence[];
+  promotion: IPromotion[];
+}
 export interface ICompetence {
+  [x: string]: any;
   id: number;
   comp: string;
 }
