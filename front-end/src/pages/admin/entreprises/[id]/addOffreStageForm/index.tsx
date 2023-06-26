@@ -51,11 +51,18 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
       ? existingOffrestage?.nb_places_offered || 0
       : 0,
     promotion: isEditMode ? existingOffrestage?.promotion || [] : [],
+
     competence: isEditMode ? existingOffrestage?.competence || [] : [],
-    entreprise_id: isEditMode
-      ? Number(existingOffrestage?.entreprise_id) || 0
-      : 0,
-    localite: isEditMode ? existingOffrestage?.localite || [] : [],
+
+    localite_id: isEditMode ? existingOffrestage?.localite_id || 0 : 0,
+    localite: isEditMode
+      ? existingOffrestage?.localite || {
+          id: 0,
+          adress: "",
+          city: "",
+          code_postal: "",
+        }
+      : { id: 0, adress: "", city: "", code_postal: "" },
   });
 
   const [localites, setLocalites] = useState<ILocalite[]>([]);
@@ -138,19 +145,55 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
     }
   };
   useEffect(() => {
-    axios
-      .get(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
-      .then((response) => {
-        setLocalites(response.data.localities);
-        setOffre((prevData) => ({
-          ...prevData,
-          entreprise_id: Number(entrepriseId),
-        }));
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [entrepriseId]);
+    if (!isEditMode) {
+      axios
+        .get(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
+        .then((response) => {
+          setLocalites(response.data.localities);
+          setOffre((prevData) => ({
+            ...prevData,
+            entreprise_id: Number(entrepriseId),
+          }));
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }
+  }, []);
+  useEffect(() => {
+    if (isEditMode && existingOffrestage) {
+      const h = existingOffrestage?.localite_id;
+
+      console.log("hedha offre de stage fel edit", existingOffrestage);
+      axios
+        .get(`http://localhost:8000/api/entreprise/${h}`, config)
+        .then((response) => {
+          setLocalites(response.data.localities);
+          console.log("hedhi localite fel edit" + response.data);
+          if (existingOffrestage)
+            setOffre((prevData) => ({
+              ...prevData,
+              localite_id: Number(existingOffrestage?.localite_id),
+            }));
+          return axios.get(
+            `http://localhost:8000/api/localite/${existingOffrestage.localite_id}`,
+            config
+          );
+        })
+        .then((response) => {
+          setOffre((prevData) => ({
+            ...prevData,
+            localite: response.data,
+          }));
+
+          setSelectedLocality(response.data.id.toString()); // <-- Here's the new line of code
+          console.log("Response from the second API call: ", response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }
+  }, []);
   const handleRemoveCompetence = (competenceId: number) => {
     axios
       .delete(`http://localhost:8000/api/competence/${competenceId}`, config)
@@ -175,7 +218,7 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
     compensation_basis: offre.compensation_basis,
     offer_date: offre.offer_date,
     nb_places_offered: offre.nb_places_offered,
-    promotion: selectedPromotion,
+    promotion: [selectedPromotion],
     localite_id: selectedLocality,
     competence: competenceIds,
     entreprise_id: entrepriseId,
@@ -187,12 +230,12 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!offre.offer_date || !entrepriseId) {
+    if (!offre.offer_date) {
       console.error("offer_date or entrepriseId cannot be null");
       return;
     }
 
-    if (isEditMode) {
+    if (!isEditMode) {
       axios
         .post("http://localhost:8000/api/offrestage", offreStage, config)
         .then((response) => {
@@ -203,19 +246,20 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
           console.error("Error posting data:", error);
         });
     } else {
-      axios
-        .patch(
-          `http://localhost:8000/api/offrestage/${offre.id}`,
-          offre,
-          config
-        )
-        .then(() => {
-          showSnackbar("success", SNACKBAR_MESSAGES.success.axios.patch);
-          navigate("/admin/offreStages");
-        })
-        .catch(() => {
-          showSnackbar("error", SNACKBAR_MESSAGES.error.axios.patch);
-        });
+      if (existingOffrestage || offre)
+        axios
+          .patch(
+            `http://localhost:8000/api/offrestage/${existingOffrestage?.id}`,
+            offreStage,
+            config
+          )
+          .then(() => {
+            showSnackbar("success", SNACKBAR_MESSAGES.success.axios.patch);
+            navigate("/admin/offreStages");
+          })
+          .catch(() => {
+            showSnackbar("error", SNACKBAR_MESSAGES.error.axios.patch);
+          });
     }
   };
 

@@ -57,7 +57,7 @@ const AppRoutes = () => {
     },
     {
       path: "/admin/entreprises/:entrepriseId/addOffreStageForm",
-      element: <AddOffreStageForm isEditMode />,
+      element: <AddOffreStageForm isEditMode={false} />,
     },
     {
       path: "/admin/etudiants",

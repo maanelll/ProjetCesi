@@ -57,12 +57,14 @@ class OffreStageContoller extends AbstractController
             })->toArray();
             $localite = $offreStage->getLocalite();
             if ($localite) {
+                $localite_id = $localite->getId();
                 $address = $localite->getAddress();
                 $cpNumber = $localite->getCPNumber();
                 $city = $localite->getCity();
                 $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
             } else {
                 $completeAddress = null;
+                $localite_id = null;
             }
             $data = [
                 'id' => $offreStage->getId(),
@@ -74,7 +76,9 @@ class OffreStageContoller extends AbstractController
                 'entreprise_name' => $entreprise,
                 'competence' => $competences,
                 'promotion' => $promotions,
-                'localite' => $completeAddress
+                'localite' => $completeAddress,
+                'localite_id' => $localite_id
+
 
             ];
 
@@ -101,12 +105,14 @@ class OffreStageContoller extends AbstractController
             })->toArray();
             $localite = $offreStage->getLocalite();
             if ($localite) {
+                $localite_id = $localite->getId();
                 $address = $localite->getAddress();
                 $cpNumber = $localite->getCPNumber();
                 $city = $localite->getCity();
                 $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
             } else {
                 $completeAddress = null;
+                $localite_id = null;
             }
             $data[] = [
                 'id' => $offreStage->getId(),
@@ -118,7 +124,9 @@ class OffreStageContoller extends AbstractController
                 'entreprise_name' => $entreprise,
                 'competence' => $competences,
                 'promotion' => $promotions,
-                'localite' => $completeAddress
+                'localite' => $completeAddress,
+                'localite_id' => $localite_id
+
             ];
         }
 
@@ -249,6 +257,15 @@ class OffreStageContoller extends AbstractController
                 }
             }
         }
+        if (isset($data['entreprise_name'])) {
+            $entreprise = $this->entityManager->getRepository(Entreprise::class)->findOneBy(['name' => $data['entreprise_name']]);
+            if ($entreprise) {
+                $offrestage->setEntreprise($entreprise);
+            } else {
+                // Handle the case where no matching company was found
+            }
+        }
+
 
         if (isset($data['promotion'])) {
             // Remove old promotions first

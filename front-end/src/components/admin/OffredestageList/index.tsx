@@ -80,6 +80,8 @@ const OffredestageList: React.FC = () => {
       field: "competence",
       headerName: "competences",
       width: 200,
+      valueGetter: (params) =>
+        params.row.competence.map((comp: any) => comp.comp).join(", "),
     },
 
     {
@@ -97,6 +99,8 @@ const OffredestageList: React.FC = () => {
       field: "promotion",
       headerName: "promotion",
       width: 200,
+      valueGetter: (params) =>
+        params.row.promotion.map((promo: any) => promo.promo).join(", "),
     },
     {
       field: "offer_date",

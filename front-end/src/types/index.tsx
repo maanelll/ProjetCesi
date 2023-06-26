@@ -35,8 +35,8 @@ export interface IOffrestage {
   name: string;
   competence: ICompetence[];
   promotion: IPromotion[];
-  entreprise_id: number;
-  localite: ILocalite[];
+  localite_id: number;
+  localite: ILocalite;
 }
 export interface ICompetence {
   id: number;
