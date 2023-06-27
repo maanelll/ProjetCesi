@@ -9,7 +9,6 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -18,7 +17,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
     
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setIsAuthenticated(true);
       setToken(storedToken);
@@ -41,13 +40,19 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
   
   const decodeAndSetRole = (token: string): void => {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      setRole(JSON.parse(jsonPayload).roles[0]);
-    };
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    setRole(JSON.parse(jsonPayload).roles[0]);
+  };
 
   const login = async (username: string, password: string): Promise<void> => {
     try {
@@ -56,21 +61,21 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password,
       });
       const newToken = response.data.token;
-      localStorage.setItem('token', newToken);
+      localStorage.setItem("token", newToken);
       setIsAuthenticated(true);
       setToken(newToken);
-      setErrorMessage('');
+      setErrorMessage("");
       decodeAndSetRole(newToken);
     } catch (error) {
-      setErrorMessage('email ou  mot de passe invalide');
+      setErrorMessage("email ou  mot de passe invalide");
     }
   };
 
   const logout = (): void => {
-    localStorage.removeItem('token');
-      setIsAuthenticated(false);
-      setToken(null);
-      navigate(`signIn`,{ replace: true });
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    setToken(null);
+    navigate(`signIn`, { replace: true });
   };
 
   return (

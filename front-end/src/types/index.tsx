@@ -47,8 +47,8 @@ export interface IOffrestage {
   name: string;
   competence: ICompetence[];
   promotion: IPromotion[];
-  entreprise_name: string;
-  localite: string;
+  localite_id: number;
+  localite: ILocalite;
 }
 export interface IWishlist {
   id: number;

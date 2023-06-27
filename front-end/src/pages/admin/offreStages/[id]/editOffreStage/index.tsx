@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { IEntreprise } from "../../../../../types";
+import { IOffrestage } from "../../../../../types";
 import axios from "axios";
-import CreateEntreprise from "../../create";
 import AuthContext from "../../../../../config/authContext";
+import AddOffreStageForm from "../../../entreprises/[id]/addOffreStageForm";
 
-const EditEntreprise = () => {
-  const { entrepriseId } = useParams();
-  const [entreprise, setEntreprise] = useState<IEntreprise | null>(null);
+const EditOffreStage = () => {
+  const { offreStageId } = useParams();
+
+  const [offreStage, setOffreStage] = useState<IOffrestage | null>(null);
   const { token } = useContext(AuthContext);
   const config = {
     headers: {
@@ -16,18 +17,18 @@ const EditEntreprise = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/entreprise/${entrepriseId}`, config)
+      .get(`http://localhost:8000/api/offrestage/${offreStageId}`, config)
       .then((response) => {
-        setEntreprise(response.data);
+        setOffreStage(response.data);
       })
       .catch((error) => {
         console.error("Error fetching entreprise data:", error);
       });
-  }, [entrepriseId]);
+  }, [offreStageId]);
   return (
     <div>
-      {entreprise ? (
-        <CreateEntreprise isEditMode={true} existingEntreprise={entreprise} />
+      {offreStage ? (
+        <AddOffreStageForm isEditMode={true} existingOffrestage={offreStage} />
       ) : (
         <p>chargement des données de l'entreprise...</p>
       )}
@@ -35,4 +36,4 @@ const EditEntreprise = () => {
   );
 };
 
-export default EditEntreprise;
+export default EditOffreStage;
