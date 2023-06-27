@@ -164,12 +164,10 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
     if (isEditMode && existingOffrestage) {
       const h = existingOffrestage?.localite_id;
 
-      console.log("hedha offre de stage fel edit", existingOffrestage);
       axios
         .get(`http://localhost:8000/api/entreprise/${h}`, config)
         .then((response) => {
           setLocalites(response.data.localities);
-          console.log("hedhi localite fel edit" + response.data);
           if (existingOffrestage)
             setOffre((prevData) => ({
               ...prevData,
@@ -187,7 +185,6 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
           }));
 
           setSelectedLocality(response.data.id.toString()); // <-- Here's the new line of code
-          console.log("Response from the second API call: ", response.data);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -204,7 +201,6 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
             (competence) => competence.id !== competenceId
           ),
         }));
-        console.log(offre.competence);
       })
       .catch((error) => {
         console.error(error);
@@ -239,7 +235,6 @@ const AddOffreStageForm: React.FC<addOffreStageFormPropos> = ({
       axios
         .post("http://localhost:8000/api/offrestage", offreStage, config)
         .then((response) => {
-          console.log(response);
           navigate("/admin/offreStages");
         })
         .catch((error) => {
