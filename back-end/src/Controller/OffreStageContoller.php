@@ -174,10 +174,12 @@ class OffreStageContoller extends AbstractController
         }
 
         if (isset($data['promotion'])) {
-            $promotionId = $data['promotion'];
-            $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
-            if ($promotion) {
-                $offrestage->addPromotion($promotion);
+            $promotionIds = $data['promotion'];
+            foreach ($promotionIds as $promotionId) {
+                $promotion = $this->entityManager->getRepository(Promotion::class)->find($promotionId);
+                if ($promotion) {
+                    $offrestage->addPromotion($promotion);
+                }
             }
         }
 
@@ -280,6 +282,15 @@ class OffreStageContoller extends AbstractController
                 if ($promotion) {
                     $offrestage->addPromotion($promotion);
                 }
+            }
+        }
+        if (isset($data['localite_id'])) {
+            $localite = $this->entityManager->getRepository(Localite::class)->find($data['localite_id']);
+            if ($localite) {
+                $offrestage->setLocalite($localite);
+            } else {
+                // Handle the situation when the Localite does not exist
+                // For instance, return an error response or assign a default value
             }
         }
 
