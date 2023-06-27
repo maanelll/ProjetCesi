@@ -8,18 +8,23 @@ import axios from 'axios';
 import { error } from 'console';
 
 const Dashboard: React.FC = () => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, token} = useContext(AuthContext);
   const [nbOffreStage, setNbOffreStage] = useState<number>()
-  // useEffect(() => {
-  //   axios.get("http://localhost:8000/api/offreStage")
-  //   .then(response => {
-  //     const dataLength = response.data.length;
-  //     setNbOffreStage(dataLength);
-  //   })
-  //     .catch(error => {
-  //     console.log(error)
-  //   })
-  // }, [])
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}` 
+    }
+  };
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/offrestage",config)
+    .then(response => {
+      const dataLength = response.data.length;
+      setNbOffreStage(dataLength);
+    })
+      .catch(error => {
+      console.log(error)
+    })
+  }, [])
   
   return (
     <Box >
@@ -34,7 +39,7 @@ const Dashboard: React.FC = () => {
             height:"60%"
             }}>
               <Typography  align="center" sx={{padding:"25px", color: 'white',font:"38px Roboto, Helvetica, Arial, sans-serif",margin:"0px 0px 40px" }}>
-                {nbOffreStage}242 545 offres de stages disponibles
+                {nbOffreStage} offres de stages disponibles
               </Typography>
               <Box 
               sx={{
