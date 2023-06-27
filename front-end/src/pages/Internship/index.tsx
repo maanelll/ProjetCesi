@@ -9,7 +9,7 @@ import { SNACKBAR_MESSAGES } from '../../config/constants';
 
 
 const Internship = () => {
-    const { token,loggedUser } = useContext(AuthContext);
+    const { token,loggedUser,role } = useContext(AuthContext);
     const showSnackbar = useSnackbar();
     const [favorites, setFavorites] = useState<number[]>([]);
     const [searchSkills, setSearchSkills] = useState('');
@@ -18,6 +18,8 @@ const Internship = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(4);
     const userId = loggedUser?.id;
+    const isAdmin = role === "ROLE_ADMIN";
+    const isPilot = role === "ROLE_PILOTE";
     const config = {
     headers: {
       Authorization: `Bearer ${token}` 
@@ -157,22 +159,24 @@ const Internship = () => {
                 <Typography variant="h6">{internship.name}</Typography>
                 {/* <Typography variant="body1">{internship.entreprise_name}</Typography> */}
                 <Typography variant="body2" color="textSecondary">
-                  {/* {internship.localite} */}
+                  {internship.localite_id}hhhh
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Competences demandées: {internship.competence.map((competence) => competence).join(', ')}
+                  Competences demandées: {internship.competence.map((competence) => competence.comp).join(', ')}
                 </Typography>
               </Box>
-              <IconButton
-                color={favorites.includes(internship.id) ? 'warning' : 'warning'}
-                onClick={() => handleFavoriteClick(internship.id)}
-              >
-                {favorites.includes(internship.id) ? (
-                  <Favorite />
-                ) : (
-                  <FavoriteBorder />
-                )}
-              </IconButton>
+              {!(isAdmin || isPilot) && (
+                <IconButton
+                  color={favorites.includes(internship.id) ? 'warning' : 'warning'}
+                  onClick={() => handleFavoriteClick(internship.id)}
+                >
+                  {favorites.includes(internship.id) ? (
+                    <Favorite />
+                  ) : (
+                    <FavoriteBorder />
+                  )}
+                </IconButton>
+              )}
             </Box>
           </CardContent>
         </Card>
