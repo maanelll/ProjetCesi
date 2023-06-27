@@ -7,6 +7,7 @@ export interface IEntreprise {
 }
 
 export interface ILocalite {
+  [x: string]: any;
   id: number;
   adress: string;
   code_postal: string;
@@ -50,7 +51,21 @@ export interface IOffrestage {
   localite_id: number;
   localite: ILocalite;
 }
+export interface IWishlist {
+  id: number;
+  name: string;
+  internship_duration: number;
+  compensation_basis: number;
+  offer_date: Date;
+  nb_places_offered: number;
+  entreprise_name: string;
+  
+  competences: ICompetence[];
+  promotion: IPromotion;
+  localite: ILocalite;
+}
 export interface ICompetence {
+  [x: string]: any;
   id: number;
   comp: string;
 }
