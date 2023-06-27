@@ -1,7 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import AuthContext from "../../../../config/authContext";
 import { IUser, IPromotion, ICenter, IRole } from "../../../../types";
 
@@ -10,7 +19,10 @@ interface CreateUserProps {
   existingUser?: IUser;
 }
 
-const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => {
+const CreateUser: React.FC<CreateUserProps> = ({
+  isEditMode,
+  existingUser,
+}) => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
@@ -28,41 +40,43 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-
   useEffect(() => {
     const config = {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     };
 
-    axios.get('https://localhost:8000/api/roles', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/roles", config)
+      .then((response) => {
         setRoles(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching roles:", error);
       });
 
-    axios.get('https://localhost:8000/api/centers', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/centers", config)
+      .then((response) => {
         setCenters(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching centers:", error);
       });
 
-    axios.get('https://localhost:8000/api/promotion', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/promotion", config)
+      .then((response) => {
         setPromotions(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching promotions:", error);
       });
 
     if (isEditMode && existingUser) {
       console.log(existingUser.role.id); // log the role id
-    console.log(existingUser.center.id); 
+      console.log(existingUser.center.id);
       setRoleId(existingUser.role.id);
       setEmail(existingUser.email);
       setFirstName(existingUser.firstName);
@@ -71,27 +85,37 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
       setCenterId(existingUser.center.id);
 
       if (Array.isArray(existingUser.promotions)) {
-        setSelectedPromotions((existingUser.promotions as IPromotion[]).map(promotion => promotion.id));
-      } else if (existingUser.promotions && typeof existingUser.promotions === 'object') {
+        setSelectedPromotions(
+          (existingUser.promotions as IPromotion[]).map(
+            (promotion) => promotion.id
+          )
+        );
+      } else if (
+        existingUser.promotions &&
+        typeof existingUser.promotions === "object"
+      ) {
         setSelectedPromotions([(existingUser.promotions as IPromotion).id]);
       }
     }
-     // Fetch pilot promotions if the selected role is "pilot"
-  if (roleId === 2) {
-    axios.get('https://localhost:8000/api/pilot_promotions', config)
-      .then(response => {
-        setPilotPromotions(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching pilot promotions:", error);
-      });
-  }
+    // Fetch pilot promotions if the selected role is "pilot"
+    if (roleId === 2) {
+      axios
+        .get("http://localhost:8000/api/pilot_promotions", config)
+        .then((response) => {
+          setPilotPromotions(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching pilot promotions:", error);
+        });
+    }
   }, [token, isEditMode, existingUser]);
 
   const displayedPromotions =
-  roleId === 2
-    ? promotions.filter((promotion: IPromotion) => !pilotPromotions.includes(promotion.promo))
-    : promotions;
+    roleId === 2
+      ? promotions.filter(
+          (promotion: IPromotion) => !pilotPromotions.includes(promotion.promo)
+        )
+      : promotions;
 
   const handleRoleChange = (event: SelectChangeEvent<number>) => {
     const roleId = event.target.value as number;
@@ -99,107 +123,116 @@ const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => 
     setSelectedPromotions([]);
   };
 
-  const handlePromotionIdsChange = (event: SelectChangeEvent<number | number[]>) => {
-    const selectedPromotions = Array.isArray(event.target.value) ? event.target.value : [event.target.value as number];
+  const handlePromotionIdsChange = (
+    event: SelectChangeEvent<number | number[]>
+  ) => {
+    const selectedPromotions = Array.isArray(event.target.value)
+      ? event.target.value
+      : [event.target.value as number];
     setSelectedPromotions(selectedPromotions);
   };
-const handleValidation = () => {
+  const handleValidation = () => {
     let formIsValid = true;
-    let newErrors = {...errors};
+    let newErrors = { ...errors };
 
-    if(!firstName){
+    if (!firstName) {
       formIsValid = false;
       newErrors["firstName"] = "Le prénom ne peut pas être vide";
     }
 
-    if(!lastName){
+    if (!lastName) {
       formIsValid = false;
       newErrors["lastName"] = "Le nom de famille ne peut pas être vide";
     }
 
-    if(!email){
+    if (!email) {
       formIsValid = false;
       newErrors["email"] = "L'email ne peut pas être vide";
     }
 
-    if(!password){
+    if (!password) {
       formIsValid = false;
       newErrors["password"] = "Le mot de passe ne peut pas être vide";
     }
 
     setErrors(newErrors);
     return formIsValid;
-  }
+  };
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (!handleValidation()) {
       console.error("Validation failed.");
       return;
     }
-  if (roleId === null || centerId === null) {
-    console.error("Role and center must be selected.");
-    return;
-  }
+    if (roleId === null || centerId === null) {
+      console.error("Role and center must be selected.");
+      return;
+    }
 
-  const userData = {
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-    password: password,
-    roleId: roleId,
-    promotionIds: selectedPromotions,
-    centerId: centerId,
-  };
+    const userData = {
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      password: password,
+      roleId: roleId,
+      promotionIds: selectedPromotions,
+      centerId: centerId,
+    };
 
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    if (isEditMode && existingUser) {
+      // update the existing user with a PUT request
+      axios
+        .put(
+          `http://localhost:8000/api/update_user/${existingUser.id}`,
+          userData,
+          config
+        )
+        .then(() => {
+          navigate("/admin/users");
+        })
+        .catch((error) => {
+          console.error(error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            setErrorMsg(error.response.data.message); // Set error message from response
+          } else {
+            setErrorMsg("An error occurred");
+          }
+        });
+    } else {
+      // create a new user with a POST request
+      axios
+        .post("http://localhost:8000/api/create_user", userData, config)
+        .then(() => {
+          navigate("/admin/users");
+        })
+        .catch((error) => {
+          console.error(error);
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            setErrorMsg(error.response.data.message); // Set error message from response
+          } else {
+            setErrorMsg("An error occurred");
+          }
+        });
     }
   };
-
-  if (isEditMode && existingUser) {
-    // update the existing user with a PUT request
-    axios.put(`https://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
-      .then(() => {
-        navigate("/admin/users");
-      })
-      .catch((error) => {
-          console.error(error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            setErrorMsg(error.response.data.message);  // Set error message from response
-          } else {
-            setErrorMsg('An error occurred');
-          }
-        });
-  } else {
-    // create a new user with a POST request
-    axios.post("https://localhost:8000/api/create_user", userData, config)
-      .then(() => {
-        navigate("/admin/users");
-      })
-      .catch((error) => {
-          console.error(error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            setErrorMsg(error.response.data.message);  // Set error message from response
-          } else {
-            setErrorMsg('An error occurred');
-          }
-        });
-  }
-};
 
   return (
     <Box sx={{ p: 3 }}>
       <form onSubmit={handleSubmit}>
-         {errorMsg && (
-          <div>{errorMsg}</div>  // Display error message if it is set
+        {errorMsg && (
+          <div>{errorMsg}</div> // Display error message if it is set
         )}
         <TextField
           name="firstName"
@@ -209,8 +242,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-           error={errors.firstName ? true : false}
-        helperText={errors.firstName}
+          error={errors.firstName ? true : false}
+          helperText={errors.firstName}
         />
         <TextField
           name="lastName"
@@ -221,7 +254,7 @@ const handleSubmit = (e: React.FormEvent) => {
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           error={errors.lastName ? true : false}
-        helperText={errors.lastName}
+          helperText={errors.lastName}
         />
         <TextField
           name="email"
@@ -232,8 +265,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-           error={errors.email ? true : false}
-        helperText={errors.email}
+          error={errors.email ? true : false}
+          helperText={errors.email}
         />
         <TextField
           name="password"
@@ -244,8 +277,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-           error={errors.password ? true : false}
-        helperText={errors.password}
+          error={errors.password ? true : false}
+          helperText={errors.password}
         />
         <FormControl fullWidth>
           <InputLabel id="role-select-label">Rôle</InputLabel>
@@ -274,14 +307,18 @@ const handleSubmit = (e: React.FormEvent) => {
             name="center"
           >
             {centers.map((center: ICenter) => (
-              <MenuItem key={center.id} value={center.id}>{center.center}</MenuItem>
+              <MenuItem key={center.id} value={center.id}>
+                {center.center}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         {(roleId === 2 || roleId === 3) && (
           <FormControl variant="outlined" fullWidth margin="normal">
-            <InputLabel id="promotion-label">Promotion{roleId === 3 ? '' : 's'}</InputLabel>
+            <InputLabel id="promotion-label">
+              Promotion{roleId === 3 ? "" : "s"}
+            </InputLabel>
             <Select
               labelId="promotion-label"
               multiple={roleId === 2}
