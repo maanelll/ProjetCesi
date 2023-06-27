@@ -7,6 +7,7 @@ export interface IEntreprise {
 }
 
 export interface ILocalite {
+  [x: string]: any;
   id: number;
   adress: string;
   code_postal: string;

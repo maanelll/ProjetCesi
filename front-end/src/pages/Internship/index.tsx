@@ -155,9 +155,9 @@ const Internship = () => {
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
                 <Typography variant="h6">{internship.name}</Typography>
-                <Typography variant="body1">{internship.entreprise_name}</Typography>
+                {/* <Typography variant="body1">{internship.entreprise_name}</Typography> */}
                 <Typography variant="body2" color="textSecondary">
-                  {internship.localite}
+                  {/* {internship.localite} */}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Competences demandées: {internship.competence.map((competence) => competence).join(', ')}
