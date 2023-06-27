@@ -52,13 +52,16 @@ export interface IOffrestage {
 }
 export interface IWishlist {
   id: number;
+  name: string;
   internship_duration: number;
   compensation_basis: number;
   offer_date: Date;
   nb_places_offered: number;
-  name: string;
-  competence: ICompetence[];
-  promotion: IPromotion[];
+  entreprise_name: string;
+  
+  competences: ICompetence[];
+  promotion: IPromotion;
+  localite: ILocalite;
 }
 export interface ICompetence {
   [x: string]: any;

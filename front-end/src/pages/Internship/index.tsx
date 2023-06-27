@@ -4,16 +4,19 @@ import { BusinessCenter, Favorite, FavoriteBorder, LocationOn } from '@mui/icons
 import { IOffrestage } from '../../types';
 import axios from 'axios';
 import AuthContext from '../../config/authContext';
+import { useSnackbar } from '../../context/SnackBarContext';
+import { SNACKBAR_MESSAGES } from '../../config/constants';
 
 
 const Internship = () => {
     const { token,loggedUser } = useContext(AuthContext);
+    const showSnackbar = useSnackbar();
     const [favorites, setFavorites] = useState<number[]>([]);
     const [searchSkills, setSearchSkills] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
     const [internships, setInternships] = useState<IOffrestage[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3);
+    const [itemsPerPage] = useState(4);
     const userId = loggedUser?.id;
     const config = {
     headers: {
@@ -51,13 +54,12 @@ const Internship = () => {
     setFavorites(favorites.filter((favoriteId) => favoriteId !== id));
     // Make the API call to remove the favorite
     axios
-      .delete(`http://localhost:8000/api/remove_offer/${userId}/${id}`,config)
+      .delete(`http://localhost:8000/api/remove_offer/${id}`,config)
       .then(response => {
-        // Handle the success response if needed
+        showSnackbar("success", SNACKBAR_MESSAGES.success.axios.delete)
       })
       .catch(error => {
-        // Handle the error if needed
-        console.error('Error removing offer:', error);
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.delete)
       });
   } else {
     // If not a favorite, add it
@@ -152,8 +154,8 @@ const Internship = () => {
           <CardContent>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Box>
-                <Typography variant="h6">{internship.entreprise_name}</Typography>
-                <Typography variant="body1">{internship.name}</Typography>
+                <Typography variant="h6">{internship.name}</Typography>
+                <Typography variant="body1">{internship.entreprise_name}</Typography>
                 <Typography variant="body2" color="textSecondary">
                   {internship.localite}
                 </Typography>
