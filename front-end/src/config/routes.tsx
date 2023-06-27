@@ -25,7 +25,6 @@ const EditOffreStage = lazy(
   () => import("../pages/admin/offreStages/[id]/editOffreStage")
 );
 const AppRoutes = () => {
-  const { role } = useContext(AuthContext);
   const element = useRoutes([
     {
       path: "/",

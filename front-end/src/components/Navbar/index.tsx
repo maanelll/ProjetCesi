@@ -100,10 +100,16 @@ const Navbar = () => {
       <Box>
         {Object.keys(routes).map((key) => {
           const { route, text, subLinks, icon } = routes[key]
-          // Skip rendering the administration route if the user is not an admin
+          
           if (!isAdmin && !isPilot && key === "admin") {
             return null;
           } 
+          if (isAdmin  && key === "wishList") {
+            return null;
+          }
+          if (isPilot && key === "wishList") {
+            return null;
+          }
           return (
             <Box
               key={key}
