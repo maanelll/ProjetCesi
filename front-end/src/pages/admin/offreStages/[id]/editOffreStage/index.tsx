@@ -16,7 +16,6 @@ const EditOffreStage = () => {
     },
   };
   useEffect(() => {
-    console.log(offreStageId);
     axios
       .get(`http://localhost:8000/api/offrestage/${offreStageId}`, config)
       .then((response) => {
