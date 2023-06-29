@@ -1,18 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from "@mui/material";
+import { Box,Alert, Button,IconButton,InputAdornment, FormControl, InputLabel, MenuItem,Select, Snackbar,SelectChangeEvent, TextField } from "@mui/material";
 import AuthContext from "../../../../config/authContext";
 import { IUser, IPromotion, ICenter, IRole } from "../../../../types";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 interface CreateUserProps {
   isEditMode: boolean;
@@ -37,8 +29,9 @@ const CreateUser: React.FC<CreateUserProps> = ({
   const [password, setPassword] = useState<string>("");
   const [centerId, setCenterId] = useState<number | null>(null);
   const [pilotPromotions, setPilotPromotions] = useState<string[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const config = {
@@ -110,6 +103,9 @@ const CreateUser: React.FC<CreateUserProps> = ({
     }
   }, [token, isEditMode, existingUser]);
 
+
+const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const displayedPromotions =
     roleId === 2
       ? promotions.filter(
@@ -137,49 +133,52 @@ const CreateUser: React.FC<CreateUserProps> = ({
 
     if (!firstName) {
       formIsValid = false;
-      newErrors["firstName"] = "Le prénom ne peut pas être vide";
+      newErrors["firstName"] = "champ oblogatoire ";
     }
 
     if (!lastName) {
       formIsValid = false;
-      newErrors["lastName"] = "Le nom de famille ne peut pas être vide";
+      newErrors["lastName"] = "champ oblogatoire";
     }
 
     if (!email) {
       formIsValid = false;
-      newErrors["email"] = "L'email ne peut pas être vide";
+      newErrors["email"] = "champ oblogatoire";
     }
 
     if (!password) {
       formIsValid = false;
-      newErrors["password"] = "Le mot de passe ne peut pas être vide";
+      newErrors["password"] = "champ oblogatoire";
     }
 
     setErrors(newErrors);
     return formIsValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
     if (!handleValidation()) {
       console.error("Validation failed.");
       return;
     }
-    if (roleId === null || centerId === null) {
-      console.error("Role and center must be selected.");
-      return;
-    }
-
-    const userData = {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      password: password,
-      roleId: roleId,
-      promotionIds: selectedPromotions,
-      centerId: centerId,
-    };
+  if (roleId === null || centerId === null) {
+    console.error("Role and center must be selected.");
+    return;
+  }
+   
+  const userData = {
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+    password: password,
+    roleId: roleId,
+    promotionIds: selectedPromotions,
+    centerId: centerId,
+  };
 
     const config = {
       headers: {
@@ -187,53 +186,45 @@ const CreateUser: React.FC<CreateUserProps> = ({
       },
     };
 
-    if (isEditMode && existingUser) {
-      // update the existing user with a PUT request
-      axios
-        .put(
-          `http://localhost:8000/api/update_user/${existingUser.id}`,
-          userData,
-          config
-        )
-        .then(() => {
-          navigate("/admin/users");
-        })
-        .catch((error) => {
-          console.error(error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            setErrorMsg(error.response.data.message); // Set error message from response
-          } else {
-            setErrorMsg("An error occurred");
-          }
-        });
-    } else {
-      // create a new user with a POST request
-      axios
-        .post("http://localhost:8000/api/create_user", userData, config)
-        .then(() => {
-          navigate("/admin/users");
-        })
-        .catch((error) => {
-          console.error(error);
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            setErrorMsg(error.response.data.message); // Set error message from response
-          } else {
-            setErrorMsg("An error occurred");
-          }
-        });
-    }
-  };
+ if (isEditMode && existingUser) {
+  // update the existing user with a PUT request
+  axios.put(`https://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
+    .then(() => {
+      navigate("/admin/users");
+    })
+   .catch(error => {
+  if (error.response) {
+    // Erreurs du serveur
+    setServerError( ` ${error.response.data.message}`);
+  } 
+});
+} else {
+  // create a new user with a POST request
+  axios.post("https://localhost:8000/api/create_user", userData, config)
+    .then(() => {
+      navigate("/admin/users");
+    })
+    .catch(error => {
+  if (error.response) {
+    // Erreurs du serveur
+    setServerError(` ${error.response.data.message}`);
+  } 
+});
+}
 
+
+  };
   return (
     <Box sx={{ p: 3 }}>
       <form onSubmit={handleSubmit}>
-        {errorMsg && (
-          <div>{errorMsg}</div> // Display error message if it is set
-        )}
+        {serverError && (
+  <Alert 
+    sx={{ backgroundColor: 'red', color: 'white', fontWeight: 'bold' }} 
+    severity="error"
+  >
+    {serverError}
+  </Alert>
+)}
         <TextField
           name="firstName"
           label="Nom"
@@ -269,16 +260,27 @@ const CreateUser: React.FC<CreateUserProps> = ({
           helperText={errors.email}
         />
         <TextField
-          name="password"
-          label="Mot de passe"
-          type="password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={errors.password ? true : false}
-          helperText={errors.password}
+            name="password"
+            label="Mot de passe"
+            type={showPassword ? "text" : "password"}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={errors.password ? true : false}
+            helperText={errors.password}
+            InputProps={{ 
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
         />
         <FormControl fullWidth>
           <InputLabel id="role-select-label">Rôle</InputLabel>
@@ -340,6 +342,7 @@ const CreateUser: React.FC<CreateUserProps> = ({
           Enregistrer
         </Button>
       </form>
+      
     </Box>
   );
 };

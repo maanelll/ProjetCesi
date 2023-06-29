@@ -1,26 +1,37 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box,TextField,InputAdornment , Typography, IconButton, DialogTitle, DialogContentText, Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
+import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { IUser, IPromotion } from "../../../types";
 import AuthContext from "../../../config/authContext";
-import {
-  EditOutlined as EditIcon,
-  DeleteOutline as DeleteIcon,
-} from "@mui/icons-material";
+import { EditOutlined as EditIcon, DeleteOutline as DeleteIcon, Warning as WarningIcon } from "@mui/icons-material";
 import { styled } from "@mui/system";
 
 const UsersList: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const [users, setUsers] = useState<IUser[]>([]);
+  const [open, setOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState<number | null>(null);
+   const [searchValue, setSearchValue] = useState("");
 
   const StyledHeaderCell = styled("div")`
-    font-size: 16px;
+    font-size: 16px; 
     font-weight: bold;
     text-align: "center";
   `;
+
+  const handleClickOpen = (userId: number) => {
+    setOpen(true);
+    setUserIdToDelete(userId);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setUserIdToDelete(null);
+  };
 
   const config = {
     headers: {
@@ -28,49 +39,59 @@ const UsersList: React.FC = () => {
     },
   };
 
-  const handleDeleteUserClick = (userId: number) => {
-    axios
-      .delete(`http://localhost:8000/api/delete_user/${userId}`, config)
-      .then(() => {
-        // Refresh the users list after deletion
-        fetchUsers();
-      })
-      .catch((error) => {
-        console.error("Error deleting", error);
-      });
+  const handleDeleteUserClick = () => {
+    if(userIdToDelete !== null){
+      axios.delete(`https://localhost:8000/api/delete_user/${userIdToDelete}`, config)
+        .then(() => {
+          // Refresh the users list after deletion
+          fetchUsers();
+        })
+        .catch((error) => {
+          console.error("Error deleting", error);
+        });
+      handleClose();
+    }
   };
 
   const handleEditUserClick = (userId: number) => {
     navigate(`/admin/users/${userId}/edit`);
   };
+const filterUser = (user: IUser[]) => {
+  if (searchValue.trim() === "") {
+    return user;
+  }
+
+  const filteredUsers = user.filter((user) =>
+    user.firstName.toLowerCase().includes(searchValue.toLowerCase()) ||
+    user.lastName.toLowerCase().includes(searchValue.toLowerCase()) 
+  );
+  
+  console.log("Filtered users:", filteredUsers);
+  return filteredUsers;
+};
 
   const fetchUsers = () => {
-    axios
-      .get(`http://localhost:8000/api/users`, config)
+    axios.get(`https://localhost:8000/api/users`, config)
       .then((response) => {
         const users = response.data.map((user: any) => {
           // Si promotions est une chaîne, convertissez-la en un tableau contenant un objet IPromotion
-          if (typeof user.promotions === "string") {
+          if (typeof user.promotions === 'string') {
             return {
               ...user,
-              promotions: [
-                {
-                  id: 1, // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
-                  promo: user.promotions,
-                },
-              ],
+              promotions: [{
+                id: 1,  // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
+                promo: user.promotions,
+              }],
             };
           }
           // Si promotions est un tableau de chaînes, convertissez chaque chaîne en un objet IPromotion
           else if (Array.isArray(user.promotions)) {
             return {
               ...user,
-              promotions: user.promotions.map(
-                (promo: string, index: number) => ({
-                  id: index + 1, // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
-                  promo,
-                })
-              ),
+              promotions: user.promotions.map((promo: string, index: number) => ({
+                id: index + 1,  // Assurez-vous de remplacer cette valeur par une valeur d'ID valide
+                promo,
+              })),
             };
           }
           return user;
@@ -146,9 +167,7 @@ const UsersList: React.FC = () => {
       field: "actions",
       headerName: "Actions",
       width: 200,
-      renderHeader: (params) => (
-        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
-      ),
+      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>,
       renderCell: (params: GridCellParams) => {
         const userId = params.row.id as number;
         return (
@@ -163,7 +182,7 @@ const UsersList: React.FC = () => {
             <IconButton
               size="small"
               color="secondary"
-              onClick={() => handleDeleteUserClick(userId)}
+              onClick={() => handleClickOpen(userId)}
             >
               <DeleteIcon />
             </IconButton>
@@ -178,14 +197,36 @@ const UsersList: React.FC = () => {
       <Typography variant="h5" sx={{ mb: 3, fontSize: "1.5rem" }}>
         Liste des utilisateurs
       </Typography>
-      <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
-        <DataGrid
-          rows={users}
-          columns={columns}
-          autoPageSize
-          getRowId={(row) => row.id}
+        <TextField
+          variant="outlined"
+          placeholder="Rechercher"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          style={{ marginBottom: "10px" }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
         />
-      </div>
+      <div style={{ height: 350, width: "100%" }}>
+          <DataGrid<IUser> rows={filterUser(users)} columns={columns} autoPageSize getRowId={(row) => row.id} />
+        </div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{"Confirmez la suppression"}</DialogTitle>
+        <DialogContent>
+          <WarningIcon />
+          <DialogContentText>
+            {"Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Annuler</Button>
+          <Button onClick={handleDeleteUserClick}>Supprimer</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
