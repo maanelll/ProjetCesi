@@ -11,7 +11,10 @@ interface CreateUserProps {
   existingUser?: IUser;
 }
 
-const CreateUser: React.FC<CreateUserProps> = ({ isEditMode, existingUser }) => {
+const CreateUser: React.FC<CreateUserProps> = ({
+  isEditMode,
+  existingUser,
+}) => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
@@ -33,37 +36,40 @@ const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
     const config = {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     };
 
-    axios.get('https://localhost:8000/api/roles', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/roles", config)
+      .then((response) => {
         setRoles(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching roles:", error);
       });
 
-    axios.get('https://localhost:8000/api/centers', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/centers", config)
+      .then((response) => {
         setCenters(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching centers:", error);
       });
 
-    axios.get('https://localhost:8000/api/promotion', config)
-      .then(response => {
+    axios
+      .get("http://localhost:8000/api/promotion", config)
+      .then((response) => {
         setPromotions(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching promotions:", error);
       });
 
     if (isEditMode && existingUser) {
       console.log(existingUser.role.id); // log the role id
-    console.log(existingUser.center.id); 
+      console.log(existingUser.center.id);
       setRoleId(existingUser.role.id);
       setEmail(existingUser.email);
       setFirstName(existingUser.firstName);
@@ -72,30 +78,40 @@ const [showPassword, setShowPassword] = useState(false);
       setCenterId(existingUser.center.id);
 
       if (Array.isArray(existingUser.promotions)) {
-        setSelectedPromotions((existingUser.promotions as IPromotion[]).map(promotion => promotion.id));
-      } else if (existingUser.promotions && typeof existingUser.promotions === 'object') {
+        setSelectedPromotions(
+          (existingUser.promotions as IPromotion[]).map(
+            (promotion) => promotion.id
+          )
+        );
+      } else if (
+        existingUser.promotions &&
+        typeof existingUser.promotions === "object"
+      ) {
         setSelectedPromotions([(existingUser.promotions as IPromotion).id]);
       }
     }
-     // Fetch pilot promotions if the selected role is "pilot"
-  if (roleId === 2) {
-    axios.get('https://localhost:8000/api/pilot_promotions', config)
-      .then(response => {
-        setPilotPromotions(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching pilot promotions:", error);
-      });
-  }
+    // Fetch pilot promotions if the selected role is "pilot"
+    if (roleId === 2) {
+      axios
+        .get("http://localhost:8000/api/pilot_promotions", config)
+        .then((response) => {
+          setPilotPromotions(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching pilot promotions:", error);
+        });
+    }
   }, [token, isEditMode, existingUser]);
 
 
 const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const displayedPromotions =
-  roleId === 2
-    ? promotions.filter((promotion: IPromotion) => !pilotPromotions.includes(promotion.promo))
-    : promotions;
+    roleId === 2
+      ? promotions.filter(
+          (promotion: IPromotion) => !pilotPromotions.includes(promotion.promo)
+        )
+      : promotions;
 
   const handleRoleChange = (event: SelectChangeEvent<number>) => {
     const roleId = event.target.value as number;
@@ -103,37 +119,41 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
     setSelectedPromotions([]);
   };
 
-  const handlePromotionIdsChange = (event: SelectChangeEvent<number | number[]>) => {
-    const selectedPromotions = Array.isArray(event.target.value) ? event.target.value : [event.target.value as number];
+  const handlePromotionIdsChange = (
+    event: SelectChangeEvent<number | number[]>
+  ) => {
+    const selectedPromotions = Array.isArray(event.target.value)
+      ? event.target.value
+      : [event.target.value as number];
     setSelectedPromotions(selectedPromotions);
   };
-const handleValidation = () => {
+  const handleValidation = () => {
     let formIsValid = true;
-    let newErrors = {...errors};
+    let newErrors = { ...errors };
 
-    if(!firstName){
+    if (!firstName) {
       formIsValid = false;
       newErrors["firstName"] = "champ oblogatoire ";
     }
 
-    if(!lastName){
+    if (!lastName) {
       formIsValid = false;
       newErrors["lastName"] = "champ oblogatoire";
     }
 
-    if(!email){
+    if (!email) {
       formIsValid = false;
       newErrors["email"] = "champ oblogatoire";
     }
 
-    if(!password){
+    if (!password) {
       formIsValid = false;
       newErrors["password"] = "champ oblogatoire";
     }
 
     setErrors(newErrors);
     return formIsValid;
-  }
+  };
 
   const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -160,11 +180,11 @@ const handleSubmit = (e: React.FormEvent) => {
     centerId: centerId,
   };
 
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  };
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
  if (isEditMode && existingUser) {
   // update the existing user with a PUT request
@@ -213,8 +233,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-           error={errors.firstName ? true : false}
-        helperText={errors.firstName}
+          error={errors.firstName ? true : false}
+          helperText={errors.firstName}
         />
         <TextField
           name="lastName"
@@ -225,7 +245,7 @@ const handleSubmit = (e: React.FormEvent) => {
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           error={errors.lastName ? true : false}
-        helperText={errors.lastName}
+          helperText={errors.lastName}
         />
         <TextField
           name="email"
@@ -236,8 +256,8 @@ const handleSubmit = (e: React.FormEvent) => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-           error={errors.email ? true : false}
-        helperText={errors.email}
+          error={errors.email ? true : false}
+          helperText={errors.email}
         />
         <TextField
             name="password"
@@ -289,14 +309,18 @@ const handleSubmit = (e: React.FormEvent) => {
             name="center"
           >
             {centers.map((center: ICenter) => (
-              <MenuItem key={center.id} value={center.id}>{center.center}</MenuItem>
+              <MenuItem key={center.id} value={center.id}>
+                {center.center}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         {(roleId === 2 || roleId === 3) && (
           <FormControl variant="outlined" fullWidth margin="normal">
-            <InputLabel id="promotion-label">Promotion{roleId === 3 ? '' : 's'}</InputLabel>
+            <InputLabel id="promotion-label">
+              Promotion{roleId === 3 ? "" : "s"}
+            </InputLabel>
             <Select
               labelId="promotion-label"
               multiple={roleId === 2}

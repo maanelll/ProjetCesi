@@ -30,11 +30,11 @@ class WishListController extends AbstractController
         $role = $user->getRole();
         $offreStage = $offreStageRepository->find($offreStageId);
 
-        if(!$user || $role->getName() !== 'ROLE_ETUDIANT') {
+        if (!$user || $role->getName() !== 'ROLE_ETUDIANT') {
             throw $this->createNotFoundException('No student found');
         }
 
-        if(!$offreStage) {
+        if (!$offreStage) {
             throw $this->createNotFoundException('No stage found');
         }
 
@@ -55,7 +55,7 @@ class WishListController extends AbstractController
     {
         $wishList = $wishListRepository->find($id);
 
-        if(!$wishList) {
+        if (!$wishList) {
             throw $this->createNotFoundException('No wishlist entry found');
         }
 
@@ -65,54 +65,54 @@ class WishListController extends AbstractController
         return new JsonResponse("succes");
     }
 
-/**
- * @Route("/wishlist/{userId}", name="wishlist_index", methods={"GET"})
- */
-public function showWishlist(int $userId, UserRepository $userRepository, WishListRepository $wishListRepository): JsonResponse
-{
-    $user = $userRepository->find($userId);
-    $role = $user->getRole();
-   
-    if(!$user || $role->getName() !== 'ROLE_ETUDIANT') {
-        throw $this->createNotFoundException('No student found');
-    }
+    /**
+     * @Route("/wishlist/{userId}", name="wishlist_index", methods={"GET"})
+     */
+    public function showWishlist(int $userId, UserRepository $userRepository, WishListRepository $wishListRepository): JsonResponse
+    {
+        $user = $userRepository->find($userId);
+        $role = $user->getRole();
 
-    $wishlist = $wishListRepository->findBy(['user' => $user]);
-
-    $offreStages = [];
-    foreach($wishlist as $wish) {
-        $offreStage = $wish->getOffreStage();
-
-        $offer_date = $offreStage->getOffer_date();
-        $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
-        $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
-        $offer_date = $offreStage->getOffer_date();
-        $competences = $offreStage->getCompetences()->map(fn ($competence) => $competence->getId())->toArray();
-        $localite = $offreStage->getLocalite();
-        if ($localite) {
-            $address = $localite->getAddress();
-            $cpNumber = $localite->getCPNumber();
-            $city = $localite->getCity();
-            $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
-        } else {
-            $completeAddress = null;
+        if (!$user || $role->getName() !== 'ROLE_ETUDIANT') {
+            throw $this->createNotFoundException('No student found');
         }
-        
-        $offreStages[] = [
-            'id' => $offreStage->getId(),
-            'name' => $offreStage->getName(),
-            'internship_duration' => $offreStage->getInternship_duration(),
-            'compensation_basis' => $offreStage->getCompensation_basis(),
-            'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
-            'nb_places_offered' => $offreStage->getNb_places_offered(),
-            'entreprise_name' => $entreprise,
-            'competences' => $competences,
-            'promotions' => $promotions,
-            'localite' => $completeAddress,
-        ];
+
+        $wishlist = $wishListRepository->findBy(['user' => $user]);
+
+        $offreStages = [];
+        foreach ($wishlist as $wish) {
+            $offreStage = $wish->getOffreStage();
+
+            $offer_date = $offreStage->getOffer_date();
+            $entreprise = $offreStage->getEntreprise() ? $offreStage->getEntreprise()->getName() : null;
+            $promotions = $offreStage->getPromotions()->map(fn ($promotion) => $promotion->getPromo())->toArray();
+            $offer_date = $offreStage->getOffer_date();
+            $competences = $offreStage->getCompetences()->map(fn ($competence) => $competence->getComp())->toArray();
+            $localite = $offreStage->getLocalite();
+            if ($localite) {
+                $address = $localite->getAddress();
+                $cpNumber = $localite->getCPNumber();
+                $city = $localite->getCity();
+                $completeAddress = $address . ', ' . $cpNumber . ' ' . $city;
+            } else {
+                $completeAddress = null;
+            }
+
+            $offreStages[] = [
+                'id' => $wish->getId(),
+                'offreStage_id' => $offreStage->getId(),
+                'name' => $offreStage->getName(),
+                'internship_duration' => $offreStage->getInternship_duration(),
+                'compensation_basis' => $offreStage->getCompensation_basis(),
+                'offer_date' => $offer_date ? $offer_date->format('Y-m-d') : null,
+                'nb_places_offered' => $offreStage->getNb_places_offered(),
+                'entreprise_name' => $entreprise,
+                'competences' => $competences,
+                'promotions' => $promotions,
+                'localite' => $completeAddress,
+            ];
+        }
+
+        return new JsonResponse($offreStages);
     }
-
-    return new JsonResponse($offreStages);
-}
-
 }

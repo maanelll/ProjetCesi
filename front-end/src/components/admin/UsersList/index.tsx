@@ -35,8 +35,8 @@ const UsersList: React.FC = () => {
 
   const config = {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
 
   const handleDeleteUserClick = () => {
@@ -108,15 +108,45 @@ const filterUser = (user: IUser[]) => {
   }, []);
 
   const columns: GridColDef[] = [
-    { field: "firstName", headerName: "Nom", width: 200 ,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
-    { field: "lastName", headerName: "Prénom",width: 200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
-    { field: "role", headerName: "Rôle", width:200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
-    { field: "center", headerName: "Centre",width: 200,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>  },
+    {
+      field: "firstName",
+      headerName: "Nom",
+      width: 200,
+      renderHeader: (params) => (
+        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      ),
+    },
+    {
+      field: "lastName",
+      headerName: "Prénom",
+      width: 200,
+      renderHeader: (params) => (
+        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      ),
+    },
+    {
+      field: "role",
+      headerName: "Rôle",
+      width: 200,
+      renderHeader: (params) => (
+        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      ),
+    },
+    {
+      field: "center",
+      headerName: "Centre",
+      width: 200,
+      renderHeader: (params) => (
+        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      ),
+    },
     {
       field: "promotions",
       headerName: "Promotions",
       width: 200,
-      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>, 
+      renderHeader: (params) => (
+        <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      ),
       renderCell: (params: GridCellParams) => {
         const user = params.row as IUser;
         if (Array.isArray(user.promotions)) {
@@ -131,7 +161,7 @@ const filterUser = (user: IUser[]) => {
           return <span>{user.promotions}</span>;
         }
         return null;
-      }
+      },
     },
     {
       field: "actions",
