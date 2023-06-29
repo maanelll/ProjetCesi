@@ -11,6 +11,7 @@ class WishList
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'wishLists'), ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private $user;
 
     #[ORM\ManyToOne(targetEntity: OffreStage::class, inversedBy: 'wishLists'), ORM\JoinColumn(nullable: false)]
