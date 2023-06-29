@@ -1,6 +1,5 @@
 import { Suspense, lazy, useContext } from "react";
 import { useRoutes } from "react-router-dom";
-import AuthContext from "./authContext";
 
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Login = lazy(() => import("../pages/Login"));
@@ -21,9 +20,9 @@ const Internship = lazy(() => import("../pages/Internship"));
 const WishList = lazy(() => import("../pages/WishList"));
 
 const OffreStages = lazy(() => import("../pages/admin/offreStages"));
-const EditOffreStage = lazy(
-  () => import("../pages/admin/offreStages/[id]/editOffreStage")
-);
+const EditOffreStage = lazy(() => import("../pages/admin/offreStages/[id]/editOffreStage"));
+const ApplyPage = lazy(() => import("../pages/ApplyPage"));
+
 const AppRoutes = () => {
   const element = useRoutes([
     {
@@ -82,6 +81,10 @@ const AppRoutes = () => {
     {
       path: "/admin/offreStages/:offreStageId/edit",
       element: <EditOffreStage />,
+    },
+    {
+      path: "/wishList/:internshipId/apply",
+      element: <ApplyPage />,
     },
   ]);
   return <Suspense fallback={<div>Loading...</div>}>{element}</Suspense>;

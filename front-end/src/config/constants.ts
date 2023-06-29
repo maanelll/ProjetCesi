@@ -64,6 +64,7 @@ export const SNACKBAR_MESSAGES = {
       delete: "Une erreur est survenue lors de la suppression des données",
       activeExpression: "Une expression est déjà active",
       date: "La date de début est ppostérieur à la date de fin",
+      apply: "Une erreur est intervenu merci de réessayer plus tard",
     },
   },
   success: {
@@ -71,6 +72,7 @@ export const SNACKBAR_MESSAGES = {
       post: "L'entité a été crée",
       patch: "L'entité a été modifiée",
       delete: "L'entité a été supprimée",
+      apply: "Votre candidature a été enregistré",
     },
   },
 }
