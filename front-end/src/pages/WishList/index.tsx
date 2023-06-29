@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Card, CardContent, Typography, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, IconButton,Button } from '@mui/material';
 import { BusinessCenter, Delete, Favorite, FavoriteBorder, LocationOn } from '@mui/icons-material';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import AuthContext from '../../config/authContext';
 import { IWishlist } from '../../types';
 
 const WishList = () => {
-    const { token, loggedUser } = useContext(AuthContext);
+  const { token, loggedUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [wishList, setWishList] = useState<IWishlist[]>([]);
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`
@@ -22,12 +25,17 @@ const WishList = () => {
       .get(`http://localhost:8000/api/wishlist/${userId}`, config)
       .then(response => {
         setWishList(response.data);
+        console.log(response.data)
       })
       .catch(error => {
         console.error('Error fetching wishlist:', error);
       });
   }
-}, [token, loggedUser]);
+    }, [token, loggedUser]);
+    
+  const handleApplyButton = (internshipId: number) => {
+      navigate(`/wishList/${internshipId}/apply`)
+    }
 
     const handleRemoveFromWishlist = (internshipId: number) => {
       if (loggedUser) {
@@ -76,16 +84,14 @@ const WishList = () => {
                   {internship.competences.map((competence) => competence).join(', ')}
                 </Typography>
               </Box>
-              <IconButton
-                color="warning"
-                onClick={() => handleRemoveFromWishlist(internship.id)}
-              >
-                {isInternshipInWishlist(internship.id) ? (
-                  <Delete />
-                ) : (
-                  <FavoriteBorder />
-                )}
-              </IconButton>
+              <Box display="flex" alignItems="center">
+                <Button variant="contained" color="warning" onClick={() => handleApplyButton(internship.offreStage_id)}>
+                  Postuler
+                </Button>
+                <IconButton color="warning" onClick={() => handleRemoveFromWishlist(internship.id)}>
+                  {isInternshipInWishlist(internship.id) ? <Delete /> : <FavoriteBorder />}
+                </IconButton>
+              </Box>
             </Box>
           </CardContent>
         </Card>
