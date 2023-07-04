@@ -39,28 +39,39 @@ class EntrepriseRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Entreprise[] Returns an array of Entreprise objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return Entreprise[] Returns an array of Entreprise objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('e')
+    //            ->andWhere('e.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('e.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?Entreprise
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?Entreprise
+    //    {
+    //        return $this->createQueryBuilder('e')
+    //            ->andWhere('e.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
+    public function findRatingByUser($userId, $entrepriseId)
+    {
+        return $this->createQueryBuilder('e')
+            ->innerJoin('e.notes', 'n')
+            ->where('n.user = :userId')
+            ->andWhere('e.id = :entrepriseId')
+            ->setParameter('userId', $userId)
+            ->setParameter('entrepriseId', $entrepriseId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

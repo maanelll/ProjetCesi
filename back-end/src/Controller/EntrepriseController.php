@@ -56,7 +56,17 @@ class EntrepriseController extends AbstractController
     private function formatEnterpriseData(Entreprise $entreprise): array
     {
         $localites = [];
+        $notes = [];
 
+        foreach ($entreprise->getNotes() as $note) {
+            $notes[] = [
+                'id' => $note->getId(),
+                'rating' => $note->getRating(),
+                'userId' => $note->getUser() ? $note->getUser()->getId() : null,
+                'entrepriseId' => $note->getEntreprise() ? $note->getEntreprise()->getId() : null,
+                // Ajoutez ici d'autres propriétés de la Note comme nécessaire
+            ];
+        }
         foreach ($entreprise->getLocalites() as $localite) {
             $localites[] = [
                 'id' => $localite->getId(),
@@ -65,6 +75,7 @@ class EntrepriseController extends AbstractController
                 'adress' => $localite->getAddress()
             ];
         }
+        // $rating = $this->entityManager->getRepository(Entreprise::class)->findRatingByUser($this->getUser()->getUserIdentifier(), $entreprise->getId());
 
         return [
             'id' => $entreprise->getId(),
@@ -72,10 +83,13 @@ class EntrepriseController extends AbstractController
             'activity_area' => $entreprise->getActivity_area(),
             'localities' => $localites,
             'nb_cesi' => $entreprise->getNb_cesi(),
+            'rating' => $notes,
+
+
         ];
     }
 
-
+    //m
     /**
      * @Route("/entreprise", name="app_create_data", methods={"POST"})
      */

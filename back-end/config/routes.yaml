@@ -107,3 +107,8 @@ app_delete_data_promotion:
   path: /promotion/{id}
   controller: App\Controller\PromotionController::deletePromotion
   methods: [DELETE]
+
+app_add_note_pilote:
+  path: /note
+  controller: App\Controller\NoteController::new
+  methods: [POST]

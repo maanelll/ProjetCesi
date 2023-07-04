@@ -20,9 +20,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-  #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: "users")]
-  #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id", nullable: false)]
-  private $role;
+    #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: "users")]
+    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id", nullable: false)]
+    private $role;
 
     /**
      * @var string The hashed password
@@ -47,10 +47,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Promotion::class, mappedBy: "pilot")]
     private Collection $managedPromotions;
 
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Note::class)]
+    private Collection $notes;
+    /**
+     * @return Collection<int, Note>
+     */
     public function __construct()
     {
         $this->managedPromotions = new ArrayCollection();
-         $this->wishLists = new ArrayCollection();
+        $this->wishLists = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,7 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
+    //s
     /**
      * A visual identifier that represents this user.
      *
@@ -80,7 +86,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->email;
     }
 
-   public function getRole(): ?Role
+    public function getRole(): ?Role
     {
         return $this->role;
     }
@@ -92,10 +98,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-   public function getRoles(): array
-{
-    return [$this->role->getName()];
-}
+    public function getRoles(): array
+    {
+        return [$this->role->getName()];
+    }
 
     /**
      * @see PasswordAuthenticatedUserInterface
@@ -128,18 +134,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setFirstName(string $firstName): self
     {
-        $this->firstName= $firstName;
+        $this->firstName = $firstName;
 
         return $this;
     }
-     public function getLastName(): ?string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
     public function setLastName(string $lastName): self
     {
-        $this->lastName= $lastName;
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -156,7 +162,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-        public function getCenter(): ?Center
+    public function getCenter(): ?Center
     {
         return $this->center;
     }
@@ -198,21 +204,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-       /**
+    /**
      * @ORM\OneToMany(targetEntity=WishList::class, mappedBy="user", orphanRemoval=true)
      */
     private $wishLists;
 
-   /**
- * @return Collection<int, WishList>
- */
-public function getWishLists(): Collection
-{
-    if ($this->wishLists === null) {
-        $this->wishLists = new ArrayCollection();
+
+
+    /**
+     * @return Collection<int, WishList>
+     */
+    public function getWishLists(): Collection
+    {
+        if ($this->wishLists === null) {
+            $this->wishLists = new ArrayCollection();
+        }
+        return $this->wishLists;
     }
-    return $this->wishLists;
-}
 
     public function addWishList(WishList $wishList): self
     {
@@ -234,5 +242,33 @@ public function getWishLists(): Collection
         }
 
         return $this;
+    }
+
+
+
+    public function addNote(Note $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes->add($note);
+            $note->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getUser() === $this) {
+                $note->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+    public function getNotes(): Collection
+    {
+        return $this->notes;
     }
 }

@@ -33,6 +33,13 @@ class Entreprise
     /**
      * @return Collection|OffreStage[]
      */
+
+    #[ORM\OneToMany(mappedBy: 'entreprise', targetEntity: Note::class)]
+    private Collection $notes;
+
+    /**
+     * @return Collection<int, Note>
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -87,7 +94,7 @@ class Entreprise
     {
         return $this->offres;
     }
-
+    //x
     public function addOffre(OffreStage $offre): self
     {
         if (!$this->offres->contains($offre)) {
@@ -108,5 +115,43 @@ class Entreprise
         }
 
         return $this;
+    }
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes->add($note);
+            $note->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getEntreprise() === $this) {
+                $note->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+    public function entrepriseRating(): array
+    {
+        $entrepriseRating = [];
+        foreach ($this->notes as $note) {
+            $entrepriseRating[] = [
+                'userId' => $note->getUser()->getId(),
+                'rating' => $note->getRating(),
+            ];
+        }
+
+        return $entrepriseRating;
     }
 }

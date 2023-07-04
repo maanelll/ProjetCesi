@@ -1,6 +1,7 @@
 import { Suspense, lazy, useContext } from "react";
 import { useRoutes } from "react-router-dom";
 import AuthContext from "./authContext";
+import EntreprisesList from "../components/admin/EntreprisesList";
 
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Login = lazy(() => import("../pages/Login"));

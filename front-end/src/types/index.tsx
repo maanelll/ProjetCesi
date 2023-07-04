@@ -1,4 +1,5 @@
 export interface IEntreprise {
+  rating: INote[];
   id: number;
   name: string;
   activity_area: string;
@@ -14,30 +15,30 @@ export interface ILocalite {
   city: string;
 }
 export interface IUser {
-    id: number
-    firstName: string
-    lastName:string
-    email: string
-    password:string
-    role: IRole
-    promotions: IPromotion[]
-    center:ICenter
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: IRole;
+  promotions: IPromotion[];
+  center: ICenter;
 }
 export interface IRole {
   id: number;
   role: string;
 }
 export interface ICentre {
-    id: number
-    centre:string
+  id: number;
+  centre: string;
 }
 export interface IPromotion {
-    id: number
-    promo:string
+  id: number;
+  promo: string;
 }
 export interface ICenter {
-    id: number
-    center:string
+  id: number;
+  center: string;
 }
 export interface IOffrestage {
   id: number;
@@ -59,7 +60,7 @@ export interface IWishlist {
   offer_date: Date;
   nb_places_offered: number;
   entreprise_name: string;
-  
+
   competences: ICompetence[];
   promotion: IPromotion;
   localite: ILocalite;
@@ -68,4 +69,10 @@ export interface ICompetence {
   [x: string]: any;
   id: number;
   comp: string;
+}
+export interface INote {
+  id: number;
+  rating: number;
+  user_id: number;
+  entreprise_id: number;
 }
