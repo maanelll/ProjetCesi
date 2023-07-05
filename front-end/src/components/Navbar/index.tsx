@@ -6,12 +6,14 @@ import { Box, Button, Typography } from "@mui/material"
 import { routes } from "../../config/constants"
 import profileImage from "../../assets/img/aymenImg.jpg";
 import AuthContext from "../../config/authContext";
+import { Notifications } from "@mui/icons-material";
+import NotificationWindow from "../NotificationWindow";
 
 
 const Navbar = () => {
   const [openedLink, setOpenedLink] = useState<string>()
   const navigate = useNavigate()
-  const { logout, role } = useContext(AuthContext);
+  const { logout, role, loggedUser} = useContext(AuthContext);
   const isAdmin = role === "ROLE_ADMIN";
   const isPilot = role === "ROLE_PILOTE";
 
@@ -53,23 +55,47 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-        <Box
+          <Typography
+          variant="h6"
           sx={{
-            width: "80px",
-            height: "80px",
-            backgroundImage: `url(${profileImage})`,
-            backgroundSize: "cover",
-            borderRadius: "50%",
-            marginBottom: "10px",
+            color: "#fff",
           }}
-        />
+          >
+           
+          {isAdmin && (
+            
+            <Box>
+              Administrateur
+            </Box>
+          )}
+          {isPilot && (
+            
+            <Box>
+              Pilote de promotion
+            </Box>
+          )}
+          {!isPilot && !isAdmin && (
+            
+            <Box>
+              Etudiant
+            </Box>
+          )}
+          
+          </Typography>
         <Typography
           variant="h6"
           sx={{
             color: "#fff",
           }}
-        >
-          Aymen KALLEL
+          >
+           
+          {loggedUser && (
+            
+            <Box>
+              {loggedUser.lastName} {loggedUser.firstName}
+            </Box>
+          )}
+          
           </Typography>
           <Button
             variant="contained"
@@ -86,14 +112,22 @@ const Navbar = () => {
           >
             <Typography sx={{color:"black",fontFamily:"arial",fontSize: "14px"}}>deconnexion</Typography>
           </Button>
+          <Box>
+          </Box>
+          {!isPilot && !isAdmin && (
+            
+            <Box>
+              <NotificationWindow/>
+            </Box>
+          )}
           </Box>
       </Box>
       <Box
             sx={{
               width: "100%",
               borderBottom: "1px solid #ffffff",
-              marginTop: "5px",
-              marginBottom:"15px"
+              marginTop: "-20px",
+              marginBottom:"10px"
             }}
           />
       

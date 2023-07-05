@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Box, Button, Rating, Typography,TextField, InputAdornment} from "@mui/material";
+import { Box, Rating, Typography,TextField, InputAdornment, IconButton} from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ import AuthContext from "../../../config/authContext";
 import { SNACKBAR_MESSAGES } from "../../../config/constants";
 import { useSnackbar } from "../../../context/SnackBarContext";
 import { styled } from "@mui/system";
+import { EditOutlined as EditIcon, DeleteOutline as DeleteIcon } from "@mui/icons-material";
+import AddIcon from '@mui/icons-material/Add';
 
 const EntreprisesList: React.FC = () => {
   const navigate = useNavigate();
@@ -63,19 +65,24 @@ const EntreprisesList: React.FC = () => {
 };
 
   const formatLocalites = (localities: ILocalite[]) => {
-    return localities.map((localite) => {
-      const { adress, code_postal, city } = localite;
-      return `${adress}, ${code_postal} ${city}`;
-    }).join(", ");
-  };
+  return (
+    <ul style={{ listStyleType: "none", padding: 0 }}>
+      {localities.map((localite) => {
+        const { adress, code_postal, city } = localite;
+        const addressString: string = `${adress}, ${code_postal} ${city}`;
+        return <li key={addressString}>{addressString}</li>;
+      })}
+    </ul>
+  );
+};
 const columns: GridColDef[] = [
   { field: "name", headerName: "Nom", width: 100, renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>},
   {
       field: "localities",
       headerName: "Localités",
-      width: 200,
+      width: 300,
       renderCell: (params) => <Typography>{formatLocalites(params.row.localities)}</Typography>,
-      renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell>
+      renderHeader: (params) => <StyledHeaderCell >{params.colDef.headerName}</StyledHeaderCell>
     },
   { field: "activity_area", headerName: "Secteur d'activité", width: 200, renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
   { field: "nb_cesi", headerName: "Nb de Stagiaire", width: 150,renderHeader: (params) => <StyledHeaderCell>{params.colDef.headerName}</StyledHeaderCell> },
@@ -90,8 +97,8 @@ const columns: GridColDef[] = [
     },
     {
       field: "conf_pilote",
-      headerName: "Confiance de pilote de promo",
-      width: 215,
+      headerName: "Confiance de pilote",
+      width: 150,
       renderCell: (params) => (
         <Rating
           name={`rating-${params.row.id}`}
@@ -112,15 +119,15 @@ const columns: GridColDef[] = [
 
       return (
         <>
-        <Button variant="contained" onClick={()=>handleButtonClick(params.row.id)}>
-          stage
-        </Button>
-          <Button variant="contained" onClick={() => handleDeleteEntrepriseClick(params.row.id)}>
-          delete
-        </Button>
-        <Button variant="contained" onClick={() => handleEditEntrepriseClick(params.row.id)}>
-          edit
-        </Button>
+        <IconButton size="small"color="secondary" onClick={()=>handleButtonClick(params.row.id)}>
+          < AddIcon/>
+        </IconButton>
+          <IconButton size="small"color="secondary" onClick={() => handleDeleteEntrepriseClick(params.row.id)}>
+          <DeleteIcon />
+        </IconButton>
+        <IconButton size="small"color="secondary" onClick={() => handleEditEntrepriseClick(params.row.id)}>
+          <EditIcon/>
+        </IconButton>
         </>
       );
     },

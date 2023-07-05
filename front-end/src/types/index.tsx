@@ -79,3 +79,11 @@ export interface IApplication {
   user_id: number;
   offreStage_id: number;
 }
+
+export interface INotification {
+  id: number;
+  title: string;
+  message: string;
+  status: string;
+  notification_date: string;
+}

@@ -75,14 +75,14 @@ const ApplyPage = () => {
         await axios.post('http://localhost:8000/api/application/create', applicationData, config);
         showSnackbar("success", SNACKBAR_MESSAGES.success.axios.apply);
       } catch (error) {
-        showSnackbar("error", SNACKBAR_MESSAGES.success.axios.apply);
+        showSnackbar("error", SNACKBAR_MESSAGES.error.axios.apply);
       }
     };
 
     reader.readAsDataURL(cvFile);
     reader.readAsDataURL(motivationFile);
   } catch (error) {
-    console.error('Error reading files:', error);
+    showSnackbar("error", SNACKBAR_MESSAGES.error.axios.apply);
   }
 };
 

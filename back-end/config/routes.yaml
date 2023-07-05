@@ -132,3 +132,28 @@ api_application_all:
     path: '/api/application/all'
     controller: 'App\Controller\ApplicationController::all'
     methods: ['GET']
+
+api_notification_user:
+    path: '/api/notification/user/{userId}'
+    controller: 'App\Controller\NotificationController::getByUser'
+    methods: GET
+
+api_notification_all:
+    path: /api/notification/all
+    controller: App\Controller\NotificationController::all
+    methods: [GET]
+
+api_notification_create:
+    path: /api/notification/create
+    controller: App\Controller\NotificationController::create
+    methods: [POST]
+
+api_notification_update:
+    path: /api/notification/update/{id}
+    controller: App\Controller\NotificationController::update
+    methods: [PATCH]
+
+api_notification_delete:
+    path: /api/notification/delete/{id}
+    controller: App\Controller\NotificationController::delete
+    methods: [DELETE]
