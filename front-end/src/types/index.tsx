@@ -54,6 +54,7 @@ export interface IOffrestage {
 }
 export interface IWishlist {
   id: number;
+  offreStage_id: number;
   name: string;
   internship_duration: number;
   compensation_basis: number;
@@ -75,4 +76,14 @@ export interface INote {
   rating: number;
   user_id: number;
   entreprise_id: number;
+}
+
+export interface IApplication {
+  id: number;
+  status: string;
+  submission_date: Date;
+  cv: string;
+  motivation_letter: string;
+  user_id: number;
+  offreStage_id: number;
 }

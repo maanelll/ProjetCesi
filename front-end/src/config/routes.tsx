@@ -25,8 +25,9 @@ const OffreStages = lazy(() => import("../pages/admin/offreStages"));
 const EditOffreStage = lazy(
   () => import("../pages/admin/offreStages/[id]/editOffreStage")
 );
+const ApplyPage = lazy(() => import("../pages/ApplyPage"));
+
 const AppRoutes = () => {
-  const { role } = useContext(AuthContext);
   const element = useRoutes([
     {
       path: "/",
@@ -84,6 +85,10 @@ const AppRoutes = () => {
     {
       path: "/admin/offreStages/:offreStageId/edit",
       element: <EditOffreStage />,
+    },
+    {
+      path: "/wishList/:internshipId/apply",
+      element: <ApplyPage />,
     },
   ]);
   return <Suspense fallback={<div>Loading...</div>}>{element}</Suspense>;

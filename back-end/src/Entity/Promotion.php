@@ -25,6 +25,7 @@ class Promotion
 
     #[ORM\ManyToOne(inversedBy: 'managedPromotions', targetEntity: User::class)]
     #[ORM\JoinColumn(name: "pilot_id", referencedColumnName: "id", nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
     private ?User $pilot = null;
 
     public function __construct()

@@ -100,6 +100,7 @@ class WishListController extends AbstractController
 
             $offreStages[] = [
                 'id' => $wish->getId(),
+                'offreStage_id' => $offreStage->getId(),
                 'name' => $offreStage->getName(),
                 'internship_duration' => $offreStage->getInternship_duration(),
                 'compensation_basis' => $offreStage->getCompensation_basis(),

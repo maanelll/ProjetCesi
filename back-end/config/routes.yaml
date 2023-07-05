@@ -112,3 +112,28 @@ app_add_note_pilote:
   path: /note
   controller: App\Controller\NoteController::new
   methods: [POST]
+
+api_application_index:
+  path: "/api/application/user/{userId}"
+  controller: 'App\Controller\ApplicationController::index'
+  methods: ["GET"]
+
+api_application_create:
+  path: /api/application/create
+  controller: App\Controller\ApplicationController::create
+  methods: POST
+
+api_application_update:
+  path: /api/application/update/{id}
+  controller: App\Controller\ApplicationController::update
+  methods: PATCH
+
+api_application_delete:
+  path: /api/application/delete/{id}
+  controller: App\Controller\ApplicationController::delete
+  methods: DELETE
+
+api_application_all:
+  path: "/api/application/all"
+  controller: 'App\Controller\ApplicationController::all'
+  methods: ["GET"]
