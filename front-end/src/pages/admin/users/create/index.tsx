@@ -1,10 +1,23 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Box,Alert, Button,IconButton,InputAdornment, FormControl, InputLabel, MenuItem,Select, Snackbar,SelectChangeEvent, TextField } from "@mui/material";
+import {
+  Box,
+  Alert,
+  Button,
+  IconButton,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import AuthContext from "../../../../config/authContext";
 import { IUser, IPromotion, ICenter, IRole } from "../../../../types";
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface CreateUserProps {
   isEditMode: boolean;
@@ -31,7 +44,7 @@ const CreateUser: React.FC<CreateUserProps> = ({
   const [pilotPromotions, setPilotPromotions] = useState<string[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const config = {
@@ -103,8 +116,7 @@ const [showPassword, setShowPassword] = useState(false);
     }
   }, [token, isEditMode, existingUser]);
 
-
-const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const displayedPromotions =
     roleId === 2
@@ -156,29 +168,29 @@ const [openSnackbar, setOpenSnackbar] = useState(false);
   };
 
   const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
+    setShowPassword(!showPassword);
+  };
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!handleValidation()) {
       console.error("Validation failed.");
       return;
     }
-  if (roleId === null || centerId === null) {
-    console.error("Role and center must be selected.");
-    return;
-  }
-   
-  const userData = {
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-    password: password,
-    roleId: roleId,
-    promotionIds: selectedPromotions,
-    centerId: centerId,
-  };
+    if (roleId === null || centerId === null) {
+      console.error("Role and center must be selected.");
+      return;
+    }
+
+    const userData = {
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      password: password,
+      roleId: roleId,
+      promotionIds: selectedPromotions,
+      centerId: centerId,
+    };
 
     const config = {
       headers: {
@@ -186,45 +198,49 @@ const handleSubmit = (e: React.FormEvent) => {
       },
     };
 
- if (isEditMode && existingUser) {
-  // update the existing user with a PUT request
-  axios.put(`https://localhost:8000/api/update_user/${existingUser.id}`, userData, config)
-    .then(() => {
-      navigate("/admin/users");
-    })
-   .catch(error => {
-  if (error.response) {
-    // Erreurs du serveur
-    setServerError( ` ${error.response.data.message}`);
-  } 
-});
-} else {
-  // create a new user with a POST request
-  axios.post("https://localhost:8000/api/create_user", userData, config)
-    .then(() => {
-      navigate("/admin/users");
-    })
-    .catch(error => {
-  if (error.response) {
-    // Erreurs du serveur
-    setServerError(` ${error.response.data.message}`);
-  } 
-});
-}
-
-
+    if (isEditMode && existingUser) {
+      // update the existing user with a PUT request
+      axios
+        .put(
+          `http://localhost:8000/api/update_user/${existingUser.id}`,
+          userData,
+          config
+        )
+        .then(() => {
+          navigate("/admin/users");
+        })
+        .catch((error) => {
+          if (error.response) {
+            // Erreurs du serveur
+            setServerError(` ${error.response.data.message}`);
+          }
+        });
+    } else {
+      // create a new user with a POST request
+      axios
+        .post("http://localhost:8000/api/create_user", userData, config)
+        .then(() => {
+          navigate("/admin/users");
+        })
+        .catch((error) => {
+          if (error.response) {
+            // Erreurs du serveur
+            setServerError(` ${error.response.data.message}`);
+          }
+        });
+    }
   };
   return (
     <Box sx={{ p: 3 }}>
       <form onSubmit={handleSubmit}>
         {serverError && (
-  <Alert 
-    sx={{ backgroundColor: 'red', color: 'white', fontWeight: 'bold' }} 
-    severity="error"
-  >
-    {serverError}
-  </Alert>
-)}
+          <Alert
+            sx={{ backgroundColor: "red", color: "white", fontWeight: "bold" }}
+            severity="error"
+          >
+            {serverError}
+          </Alert>
+        )}
         <TextField
           name="firstName"
           label="Nom"
@@ -260,27 +276,25 @@ const handleSubmit = (e: React.FormEvent) => {
           helperText={errors.email}
         />
         <TextField
-            name="password"
-            label="Mot de passe"
-            type={showPassword ? "text" : "password"}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={errors.password ? true : false}
-            helperText={errors.password}
-            InputProps={{ 
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
+          name="password"
+          label="Mot de passe"
+          type={showPassword ? "text" : "password"}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password ? true : false}
+          helperText={errors.password}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleClickShowPassword}>
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <FormControl fullWidth>
           <InputLabel id="role-select-label">Rôle</InputLabel>
@@ -342,7 +356,6 @@ const handleSubmit = (e: React.FormEvent) => {
           Enregistrer
         </Button>
       </form>
-      
     </Box>
   );
 };
