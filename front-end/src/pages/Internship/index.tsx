@@ -99,7 +99,7 @@ const Internship = () => {
     const skillsMatch =
       searchSkills === '' ||
       internship.competence.some(
-        (competence) => competence && competence.toLowerCase().includes(searchSkills.toLowerCase())
+        (competence) => competence && competence.comp.toLowerCase().includes(searchSkills.toLowerCase())
       );
     const locationMatch =
       searchLocation === '' ||

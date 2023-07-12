@@ -22,7 +22,7 @@ const WishList = lazy(() => import("../pages/WishList"));
 const OffreStages = lazy(() => import("../pages/admin/offreStages"));
 const EditOffreStage = lazy(() => import("../pages/admin/offreStages/[id]/editOffreStage"));
 const ApplyPage = lazy(() => import("../pages/ApplyPage"));
-
+const Applications = lazy(()=>import("../pages/admin/applications"))
 const AppRoutes = () => {
   const element = useRoutes([
     {
@@ -85,6 +85,10 @@ const AppRoutes = () => {
     {
       path: "/wishList/:internshipId/apply",
       element: <ApplyPage />,
+    },
+    {
+      path: "/admin/applications",
+      element: <Applications />,
     },
   ]);
   return <Suspense fallback={<div>Loading...</div>}>{element}</Suspense>;
